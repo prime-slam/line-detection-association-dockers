@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libgl1 \
     libglib2.0-0
 
-# donwload pretrained models
+# download pretrained models
 RUN python3 -m pip install --no-cache-dir gdown  \
     && gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
     && apt-get install -y --no-install-recommends unzip \
