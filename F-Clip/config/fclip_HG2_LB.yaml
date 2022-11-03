@@ -1,0 +1,19 @@
+io:
+  dataname: shanghaiTech  # york, shanghaiTech
+  resume_from:  # ckpt path when the program was stopped by accident
+  model_initialize_file:
+
+
+model:
+  # backbone parameters
+  backbone: hourglass_lines  # stacked_hourglass, hourglass_lines
+  depth: 4
+  num_stacks: 2
+  num_blocks: 1
+  inplanes: 64
+  branch_blocks: [BottleneckLine]  # Bottleneck2D, Bottleneck1D_v, Bottleneck1D_h， Bottleneck2D_c, BottleneckLine
+  line_kernel: 7
+  line:
+    mode: [v, h]
+  merge: 'maxpool'  # 'cat', 'maxpool'
+
