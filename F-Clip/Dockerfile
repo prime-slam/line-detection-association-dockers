@@ -16,15 +16,18 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
 WORKDIR /detector
 
-COPY requirements.txt requirements.txt
-
 # install dependencies
 RUN apt-get update  \
     && apt-get install --no-install-recommends -y \
     libgl1 \
     libglib2.0-0 \
     unzip \
-    && python3 -m pip install --no-cache-dir gdown -r requirements.txt
+    && rm -rf /var/lib/apt/lists/*
+
+# install python requirements
+COPY requirements.txt requirements.txt
+
+RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
 # download pretrained models
 RUN gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
