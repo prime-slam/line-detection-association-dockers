@@ -11,8 +11,8 @@ docker build -t fclip .
 To run the container use the following command:
 ```
 sudo docker run --rm --gpus=all \
---mount type=bind,source=<IMAGES_PATH>,target=/app/input \
---mount type=bind,source=<OUTPUT_PATH>,target=/app/output \
+--mount type=bind,source=<IMAGES_PATH>,target=/detector/input \
+--mount type=bind,source=<OUTPUT_PATH>,target=/detector/output \
 fclip [OPTIONAL_ARGS]
 ```
 

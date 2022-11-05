@@ -1,11 +1,28 @@
-import warnings
+# Copyright (c) 2022, Kirill Ivanov, Anastasiia Kornilova and Dmitry Iarosh
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import numpy as np
 import torch
+import warnings
 
-from os import path, makedirs
 from enum import Enum
-from FClip.line_dataset import LineDataset, collate
+from pathlib import Path
+from typing import Dict, List
+
+
 from FClip.config import C, M
+from FClip.line_dataset import LineDataset, collate
 from test import build_model
 
 warnings.filterwarnings("ignore")
@@ -19,23 +36,24 @@ class Device(Enum):
 class Adapter:
     def __init__(
         self,
-        image_path: str,
-        output_path: str,
-        lines_output_directory: str,
-        scores_output_directory: str,
-        base_config_path: str,
-        model_config_path: str,
-        pretrained_model_path: str,
+        image_path: Path,
+        output_path: Path,
+        lines_output_directory: Path,
+        scores_output_directory: Path,
+        base_config_path: Path,
+        model_config_path: Path,
+        pretrained_model_path: Path,
         device: Device,
-        batch_size: int,
+        batch_size: Path,
     ):
         self.image_path = image_path
-        self.lines_path = path.join(output_path, lines_output_directory)
-        self.scores_path = path.join(output_path, scores_output_directory)
+        self.lines_path = output_path.joinpath(lines_output_directory)
+        self.scores_path = output_path.joinpath(scores_output_directory)
         self.base_config_path = base_config_path
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
         self.batch_size = batch_size
+        self.prediction_file_suffix = ".csv"
 
         if device == Device.cuda:
             if torch.cuda.is_available():
@@ -49,8 +67,8 @@ class Adapter:
         self.__update_configuration()
 
     def run(self) -> None:
-        makedirs(self.lines_path, exist_ok=True)
-        makedirs(self.scores_path, exist_ok=True)
+        self.lines_path.mkdir(exist_ok=True)
+        self.scores_path.mkdir(exist_ok=True)
 
         image_loader = self.__create_imageloader()
 
@@ -91,7 +109,7 @@ class Adapter:
                     predicted_lines[:, y_index] *= y_scale
 
                     self.__save_results(
-                        file_name=f"{meta['image_name']}.csv",
+                        file_name=meta["image_name"],
                         lines=predicted_lines,
                         scores=scores,
                     )
@@ -105,7 +123,7 @@ class Adapter:
 
     def __create_imageloader(self) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
-            LineDataset(C.io.datadir),
+            LineDataset(Path(C.io.datadir)),
             batch_size=self.batch_size,
             collate_fn=collate,
             num_workers=C.io.num_workers,
@@ -115,11 +133,25 @@ class Adapter:
     def __save_results(
         self, file_name: str, lines: np.ndarray, scores: np.ndarray
     ) -> None:
-        np.savetxt(path.join(self.lines_path, file_name), lines, delimiter=",")
-        np.savetxt(path.join(self.scores_path, file_name), scores, delimiter=",")
+        np.savetxt(
+            self.lines_path.joinpath(file_name).with_suffix(
+                self.prediction_file_suffix
+            ),
+            lines,
+            delimiter=",",
+        )
+        np.savetxt(
+            self.scores_path.joinpath(file_name).with_suffix(
+                self.prediction_file_suffix
+            ),
+            scores,
+            delimiter=",",
+        )
 
     @staticmethod
-    def __unwrap_results(wrapped_results):
+    def __unwrap_results(
+        wrapped_results: Dict[str, torch.Tensor]
+    ) -> List[Dict[str, np.ndarray]]:
         batch_size = wrapped_results["lines"].shape[0]
         return [
             dict(

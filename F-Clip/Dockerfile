@@ -1,22 +1,37 @@
-FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
-WORKDIR /app
+# Copyright (c) 2022, Kirill Ivanov, Anastasiia Kornilova and Dmitry Iarosh
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# OpenCV dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
+
+WORKDIR /detector
+
+COPY requirements.txt requirements.txt
+
+# install dependencies
+RUN apt-get update  \
+    && apt-get install --no-install-recommends -y \
     libgl1 \
-    libglib2.0-0
+    libglib2.0-0 \
+    unzip \
+    && python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
 # download pretrained models
-RUN python3 -m pip install --no-cache-dir gdown  \
-    && gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
-    && apt-get install -y --no-install-recommends unzip \
+RUN gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
     && unzip ckpt.zip \
     && rm ckpt.zip \
     && rm -rf __MACOSX \
     && mv ckpt pretrained
-
-COPY requirements.txt requirements.txt
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
