@@ -1,0 +1,22 @@
+io:
+  dataname: shanghaiTech  # york, shanghaiTech
+  resume_from:  # ckpt path when the program was stopped by accident
+  model_initialize_file:
+
+
+model:
+  # backbone multi-task parameters
+  head:
+    lcmap:
+      focal_alpha: 4.0
+
+  # backbone parameters
+  backbone: hrnet   # hrnet,  hrnet_line
+  num_stacks: 1
+  width: 32  # 32
+
+
+optim:
+  lr: 4.0e-3
+  max_epoch: 220
+  lr_decay_epoch: [160,200]
