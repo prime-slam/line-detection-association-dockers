@@ -10,7 +10,7 @@ from FClip.config import M
 
 
 def collate(batch):
-    return (default_collate([b[0] for b in batch]), [b[1] for b in batch])
+    return (default_collate([elem[0] for elem in batch]), [elem[1] for elem in batch])
 
 
 class LineDataset(Dataset):
