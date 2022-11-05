@@ -1,4 +1,4 @@
-# Copyright (c) 2022, Kirill Ivanov, Anastasiia Kornilova and Dmitry Iarosh
+# Copyright (c) 2022, Kirill Ivanov, Anastasiia Kornilova and Dmitrii Iarosh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
