@@ -3,6 +3,7 @@ import numpy as np
 import torch
 
 from os import path, makedirs
+from enum import Enum
 from FClip.line_dataset import LineDataset, collate
 from FClip.config import C, M
 from test import build_model
@@ -10,41 +11,51 @@ from test import build_model
 warnings.filterwarnings("ignore")
 
 
+class Device(Enum):
+    cuda = 0
+    cpu = 1
+
+
 class Adapter:
     def __init__(
         self,
         image_path: str,
         output_path: str,
-        base_config_path: str = path.join(path.dirname(__file__), "config/base.yaml"),
-        model_config_path: str = path.join(
-            path.dirname(__file__), "config/fclip_HR.yaml"
-        ),
-        pretrained_model_path: str = path.join(
-            path.dirname(__file__), "pretrained/HR/checkpoint.pth.tar"
-        ),
-        batch_size: int = 2,
+        lines_output_directory: str,
+        scores_output_directory: str,
+        base_config_path: str,
+        model_config_path: str,
+        pretrained_model_path: str,
+        device: Device,
+        batch_size: int,
     ):
         self.image_path = image_path
-        self.lines_path = f"{output_path}/lines"
-        self.scores_path = f"{output_path}/scores"
+        self.lines_path = path.join(output_path, lines_output_directory)
+        self.scores_path = path.join(output_path, scores_output_directory)
         self.base_config_path = base_config_path
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
         self.batch_size = batch_size
+
+        if device == Device.cuda:
+            if torch.cuda.is_available():
+                torch.backends.cudnn.deterministic = True
+                torch.cuda.manual_seed(0)
+            else:
+                print("No available cuda device! Fall back on cpu.")
+                device = Device.cpu
+
+        self.device = device.name
         self.__update_configuration()
 
     def run(self) -> None:
         makedirs(self.lines_path, exist_ok=True)
         makedirs(self.scores_path, exist_ok=True)
 
-        if torch.cuda.is_available():
-            torch.backends.cudnn.deterministic = True
-            torch.cuda.manual_seed(0)
-
         image_loader = self.__create_imageloader()
 
-        model = build_model()
-        model.cuda()
+        model = build_model(self.device == "cpu")
+        model.to(self.device)
         model.eval()
 
         with torch.no_grad():
@@ -52,21 +63,17 @@ class Adapter:
                 heatmap_size = M.resolution
                 result = model(
                     {
-                        "image": image.cuda(),
+                        "image": image.to(self.device),
                     },
                     isTest=True,
                 )
 
-                heatmaps = result["heatmaps"]
-                for i, meta in enumerate(metadata):
+                wrapped_results = result["heatmaps"]
+                results = self.__unwrap_results(wrapped_results)
 
-                    results = {}
-                    for k, v in heatmaps.items():
-                        if v is not None:
-                            results[k] = v[i].cpu().numpy()
-
-                    predicted_lines = results["lines"]
-                    scores = results["score"]
+                for result, meta in zip(results, metadata):
+                    predicted_lines = result["lines"]
+                    scores = result["score"]
 
                     # reformat: [[y1, x1], [y2, x2]] -> [x1, y1, x2, y2]
                     predicted_lines = (
@@ -110,3 +117,14 @@ class Adapter:
     ) -> None:
         np.savetxt(path.join(self.lines_path, file_name), lines, delimiter=",")
         np.savetxt(path.join(self.scores_path, file_name), scores, delimiter=",")
+
+    @staticmethod
+    def __unwrap_results(wrapped_results):
+        batch_size = wrapped_results["lines"].shape[0]
+        return [
+            dict(
+                (prediction_name, predictions[i].cpu().numpy())
+                for prediction_name, predictions in wrapped_results.items()
+            )
+            for i in range(batch_size)
+        ]
