@@ -40,6 +40,6 @@ optional arguments:
                         pretrained model path (default:
                         pretrained/HR/checkpoint.pth.tar)
   --device STRING, -d STRING
-                        name of desired execution device (default: cuda)
+                        name of desired execution device: cuda or cpu (default: cuda)
 
 ```
