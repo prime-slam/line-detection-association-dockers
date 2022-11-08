@@ -1,0 +1,8 @@
+outputs/*
+**/*.DS_Store
+parsing/data/wireframe/images/*
+.vscode/*
+data/*
+
+**/*.pyc
+**/*.so
