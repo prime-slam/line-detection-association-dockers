@@ -30,9 +30,9 @@ optional arguments:
   --scores-dir STRING, -s STRING
                         name of scores output directory (default: scores)
   --model-config PATH, -m PATH
-                        pretrained model configuration path (default: /home/jeten/myrepos/line-detection-dockers/lcnn/config/wireframe.yaml)
+                        pretrained model configuration path (default: config/wireframe.yaml)
   --model PATH, -M PATH
-                        pretrained model path (default: /home/jeten/myrepos/line-detection-dockers/lcnn/pretrained/checkpoint.tar)
+                        pretrained model path (default: pretrained/checkpoint.tar)
   --device STRING, -d STRING
                         name of desired execution device (default: cuda)
 ```
