@@ -30,9 +30,9 @@ optional arguments:
   --scores-dir STRING, -s STRING
                         name of scores output directory (default: scores)
   --model-config PATH, -m PATH
-                        pretrained model configuration path (default: /home/jeten/myrepos/line-detection-dockers/hawp/configs/hawpv2.yaml)
+                        pretrained model configuration path (default: configs/hawpv2.yaml)
   --model PATH, -M PATH
-                        pretrained model path (default: /home/jeten/myrepos/line-detection-dockers/hawp/checkpoints/hawpv2-edb9b23f.pth)
+                        pretrained model path (default: checkpoints/hawpv2-edb9b23f.pth)
   --device STRING, -d STRING
                         name of desired execution device (default: cuda)
 
