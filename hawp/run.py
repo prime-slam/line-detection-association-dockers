@@ -14,8 +14,9 @@
 
 import argparse
 
-from adapter import Adapter, Device
 from pathlib import Path
+
+from adapter import Adapter, Device
 
 
 if __name__ == "__main__":
