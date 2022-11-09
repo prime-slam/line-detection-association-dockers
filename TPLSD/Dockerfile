@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: possible solutions: 1. change daemon.json; 2.manually install in docker contained and then commit
-# https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime
-
 FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
 WORKDIR /detector
 
