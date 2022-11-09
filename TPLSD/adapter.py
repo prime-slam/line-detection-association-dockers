@@ -11,16 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections import namedtuple
 
 import numpy as np
 import torch
 
 from enum import Enum
-from os import path, makedirs
 from pathlib import Path
+from tqdm import tqdm
 
-from config.test_config import BasicParam
 from dataset.line_dataset import LineDataset, collate
+from model import ModelConfig
 from utils.reconstruct import TPS_line
 from utils.utils import load_model
 
@@ -32,29 +33,43 @@ class Device(Enum):
 
 class Adapter:
     def __init__(
-            self,
-            image_path: Path,
-            output_path: Path,
-            lines_output_directory: Path,
-            scores_output_directory: Path,
-            batch_size: int,
+        self,
+        image_path: Path,
+        output_path: Path,
+        lines_output_directory: Path,
+        scores_output_directory: Path,
+        pretrained_model_path: Path,
+        model_config: ModelConfig,
+        device: Device,
+        batch_size: int,
     ):
         self.image_path = image_path
         self.lines_path = output_path.joinpath(lines_output_directory)
         self.scores_path = output_path.joinpath(scores_output_directory)
         self.batch_size = batch_size
+        self.pretrained_model_path = pretrained_model_path
         self.prediction_file_suffix = ".csv"
-        self.config = BasicParam()
+        self.model_config = model_config
+
+        if device == Device.cuda:
+            if torch.cuda.is_available():
+                torch.backends.cudnn.deterministic = True
+                torch.cuda.manual_seed(0)
+            else:
+                print("No available cuda device! Fall back on cpu.")
+                device = Device.cpu
+
+        self.device = device.name
 
     def run(self) -> None:
-        makedirs(self.lines_path, exist_ok=True)
-        makedirs(self.scores_path, exist_ok=True)
+        self.lines_path.mkdir(exist_ok=True)
+        self.scores_path.mkdir(exist_ok=True)
 
         model = load_model(
-            self.config.model,
-            self.config.load_model_path,
-            self.config.resume,
-            selftrain=self.config.selftrain,
+            self.model_config.model(self.model_config.head),
+            self.pretrained_model_path,
+            resume=False,
+            selftrain=False,
         )
 
         model = model.cuda()
@@ -63,7 +78,7 @@ class Adapter:
         image_loader = self.__create_imageloader()
 
         with torch.no_grad():
-            for image, metadata in image_loader:
+            for image, metadata in tqdm(image_loader):
                 wrapped_results = model(image.cuda())[-1]
                 results = self.__unwrap_results(wrapped_results)
                 for result, meta in zip(results, metadata):
@@ -75,15 +90,13 @@ class Adapter:
                     )
 
     def __get_predictions(self, model_output, meta):
-        lines, _, _, pos, _ = TPS_line(model_output, 0.0, 0.5, *self.config.outres)
+        heatmap_height, heatmap_width = self.model_config.output_resolution
+        lines, _, _, pos, _ = TPS_line(
+            model_output, 0.0, 0.5, heatmap_height, heatmap_width
+        )
         center = model_output["center"][0][0].detach().cpu().numpy()
         pos_mat = pos.astype(int)
-        scores = []
-        if len(pos) > 0:
-            scores = center.copy()
-            scores = scores[pos_mat[:, 1], pos_mat[:, 0]].tolist()
-
-        heatmap_height, heatmap_width = self.config.outres
+        scores = center[pos_mat[:, 1], pos_mat[:, 0]].tolist() if pos_mat.any() else []
 
         x_scale = meta["width"] / heatmap_height
         y_scale = meta["height"] / heatmap_width
@@ -97,17 +110,28 @@ class Adapter:
         return lines, scores
 
     def __save_results(
-            self, file_name: str, lines: np.ndarray, scores: np.ndarray
+        self, file_name: str, lines: np.ndarray, scores: np.ndarray
     ) -> None:
-        np.savetxt(path.join(self.lines_path, file_name), lines, delimiter=",")
-        np.savetxt(path.join(self.scores_path, file_name), scores, delimiter=",")
+        np.savetxt(
+            self.lines_path.joinpath(file_name).with_suffix(
+                self.prediction_file_suffix
+            ),
+            lines,
+            delimiter=",",
+        )
+        np.savetxt(
+            self.scores_path.joinpath(file_name).with_suffix(
+                self.prediction_file_suffix
+            ),
+            scores,
+            delimiter=",",
+        )
 
     def __create_imageloader(self) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
-            LineDataset(self.image_path, self.config.inres),
+            LineDataset(self.image_path, self.model_config.input_resolution),
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.config.num_workers,
             pin_memory=True,
             collate_fn=collate,
         )

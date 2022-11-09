@@ -16,7 +16,7 @@
 # https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime
 
 FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
-WORKDIR /app
+WORKDIR /detector
 
 # install dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \

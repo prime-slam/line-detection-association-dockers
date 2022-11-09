@@ -3,7 +3,8 @@ This folder contains adapters for [TP-LSD](https://github.com/Siyuada7/TP-LSD/) 
 ## Building Docker Image
 1) Install the appropriate NVIDIA drivers with at least `cuda` version 11.3 on your host machine. You can check your cuda version with `nvidia-smi` command.
 2) Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) on your host machine.
-3) Build docker image using `Dockerfile`:
+3) Change default docker runtime to nvidia. See `Default runtime` [here](https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime).
+4) Build docker image using `Dockerfile`:
 ```
 docker build -t tp-lsd .
 ```
@@ -30,6 +31,10 @@ optional arguments:
   --scores-dir STRING, -s STRING
                         name of scores output directory (default: scores)
   --batch NUM, -b NUM   dataloader batch size (default: 1)
+  --model-path PATH, -m PATH
+                        pretrained model path (default: pretraineds/HR/checkpoint.pth.tar)
+  --model STR, -M STR   Name of model: TPLSD, TPLSD_Lite, TPLSD_512 or Hourglass (default: TPLSD)
   --device STRING, -d STRING
-                        name of desired execution device (default: cuda)
+                        name of desired execution device: cuda or cpu (default: cuda)
+
 ```

@@ -3,7 +3,9 @@
 *.so
 *.o
 *pyc
-_ext*
+_ext
 build
 DCNv2.egg-info
 dist
+vendor/
+

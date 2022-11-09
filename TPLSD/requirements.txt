@@ -1,5 +1,6 @@
-pyyaml
 docopt
 matplotlib
-scikit-image
 opencv-python
+pyyaml
+scikit-image
+tqdm

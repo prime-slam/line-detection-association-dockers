@@ -16,6 +16,7 @@ import argparse
 from pathlib import Path
 
 from adapter import Adapter, Device
+from model import Model
 
 
 def positive_int(value: str) -> int:
@@ -70,6 +71,23 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--model-path",
+        "-m",
+        metavar="PATH",
+        help="pretrained model path",
+        default="pretraineds/Res320.pth",
+    )
+
+    parser.add_argument(
+        "--model",
+        "-M",
+        metavar="STR",
+        help="name of model",
+        choices=list(map(lambda c: c.name, Model)),
+        default="TPLSD",
+    )
+
+    parser.add_argument(
         "--device",
         "-d",
         metavar="STRING",
@@ -84,5 +102,8 @@ if __name__ == "__main__":
         output_path=Path(args.output),
         lines_output_directory=Path(args.lines_dir),
         scores_output_directory=Path(args.scores_dir),
+        model_config=Model[args.model].value,
         batch_size=args.batch,
+        device=Device[args.device],
+        pretrained_model_path=Path(args.model_path),
     ).run()

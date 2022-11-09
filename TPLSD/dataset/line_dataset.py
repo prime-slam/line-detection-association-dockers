@@ -19,7 +19,7 @@ class LineDataset(Dataset):
         self.image_rescale = image_rescale
 
     def __len__(self):
-        return len(self.filelist)
+        return len(self.files)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, dict]:
         path = self.files[idx]
