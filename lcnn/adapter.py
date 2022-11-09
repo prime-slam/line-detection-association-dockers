@@ -186,10 +186,6 @@ class Adapter:
                 scores = scores[:i]
                 break
 
-        # postprocess: remove overlapped lines
-        diagonal_length = (height**2 + width**2) ** 0.5
-        lines, scores = postprocess(lines, scores, diagonal_length * 0.01, 0)
-
         # reformat: [[y1, x1], [y2, x2]] -> [x1, y1, x2, y2]
         lines = lines[:, :, ::-1].flatten().reshape((-1, 4))
 
