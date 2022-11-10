@@ -37,14 +37,14 @@ class Device(Enum):
 
 class Adapter:
     def __init__(
-            self,
-            image_path: Path,
-            output_path: Path,
-            lines_output_directory: Path,
-            scores_output_directory: Path,
-            model_config_path: Path,
-            pretrained_model_path: Path,
-            device: Device,
+        self,
+        image_path: Path,
+        output_path: Path,
+        lines_output_directory: Path,
+        scores_output_directory: Path,
+        model_config_path: Path,
+        pretrained_model_path: Path,
+        device: Device,
     ):
         self.image_path = image_path
         self.lines_path = output_path / lines_output_directory
@@ -108,19 +108,15 @@ class Adapter:
         )
 
     def __save_results(
-            self, file_name: str, lines: np.ndarray, scores: np.ndarray
+        self, file_name: str, lines: np.ndarray, scores: np.ndarray
     ) -> None:
         np.savetxt(
-            (self.lines_path / file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
+            (self.lines_path / file_name).with_suffix(self.prediction_file_suffix),
             lines,
             delimiter=",",
         )
         np.savetxt(
-            (self.scores_path / file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
+            (self.scores_path / file_name).with_suffix(self.prediction_file_suffix),
             scores,
             delimiter=",",
         )
@@ -130,9 +126,9 @@ class Adapter:
             torch.from_numpy(
                 hough_transform(rows=128, cols=128, theta_res=3, rho_res=1)
             )
-                .float()
-                .contiguous()
-                .to(self.device)
+            .float()
+            .contiguous()
+            .to(self.device)
         )
 
         model = hg(
@@ -171,7 +167,7 @@ class Adapter:
         }
 
     def __postprocess_predictions(
-            self, lines: np.ndarray, scores: np.ndarray, metadata: Dict
+        self, lines: np.ndarray, scores: np.ndarray, metadata: Dict
     ) -> Tuple[np.ndarray, np.ndarray]:
         width = metadata["width"]
         height = metadata["height"]
@@ -201,7 +197,7 @@ class Adapter:
 
     @staticmethod
     def __unwrap_results(
-            wrapped_results: Dict[str, torch.Tensor]
+        wrapped_results: Dict[str, torch.Tensor]
     ) -> List[Dict[str, np.ndarray]]:
         batch_size = wrapped_results["lines"].shape[0]
         return [
