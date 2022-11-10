@@ -56,7 +56,7 @@ if __name__ == "__main__":
         "-m",
         metavar="PATH",
         help="pretrained model configuration path",
-        default=Path(__file__).resolve().parent.joinpath("configs/hawpv2.yaml"),
+        default=Path(__file__).resolve().parent / "configs/hawpv2.yaml",
     )
 
     parser.add_argument(
@@ -64,9 +64,7 @@ if __name__ == "__main__":
         "-M",
         metavar="PATH",
         help="pretrained model path",
-        default=Path(__file__)
-        .resolve()
-        .parent.joinpath("checkpoints/hawpv2-edb9b23f.pth"),
+        default=Path(__file__).resolve().parent / "checkpoints/hawpv2-edb9b23f.pth",
     )
 
     parser.add_argument(

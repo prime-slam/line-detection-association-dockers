@@ -46,8 +46,8 @@ class Adapter:
         device: Device,
     ):
         self.image_path = image_path
-        self.lines_path = output_path.joinpath(lines_output_directory)
-        self.scores_path = output_path.joinpath(scores_output_directory)
+        self.lines_path = output_path / lines_output_directory
+        self.scores_path = output_path / scores_output_directory
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
         self.prediction_file_suffix = ".csv"
@@ -105,16 +105,12 @@ class Adapter:
         self, file_name: str, lines: np.ndarray, scores: np.ndarray
     ) -> None:
         np.savetxt(
-            self.lines_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
+            (self.lines_path / file_name).with_suffix(self.prediction_file_suffix),
             lines,
             delimiter=",",
         )
         np.savetxt(
-            self.scores_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
+            (self.scores_path / file_name).with_suffix(self.prediction_file_suffix),
             scores,
             delimiter=",",
         )

@@ -16,16 +16,15 @@ FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
 
 WORKDIR /detector
 
-
 # install dependencies
 RUN apt-get update  \
     && apt-get install --no-install-recommends -y \
     libgl1 \
-    libglib2.0-0 \
-    ninja-build \
-    mesa-common-dev \
     libgl1-mesa-dev \
+    libglib2.0-0 \
     libglu1-mesa-dev \
+    mesa-common-dev \
+    ninja-build \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
@@ -34,12 +33,10 @@ COPY requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-
 # download pretrained models
 COPY downloads.sh download_models.sh
 
 RUN bash ./download_models.sh
-
 
 COPY . .
 
