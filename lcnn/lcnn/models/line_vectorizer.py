@@ -171,8 +171,8 @@ class LineVectorizer(nn.Module):
 
             # index: [N_TYPE, K]
             score, index = torch.topk(jmap, k=K)
-            y = (index // 128).float() + torch.gather(joff[:, 0], 1, index) + 0.5
-            x = (index % 128).float() + torch.gather(joff[:, 1], 1, index) + 0.5
+            y = torch.div(index, 128, rounding_mode='trunc').float() + torch.gather(joff[:, 0], 1, index) + 0.5
+            x = torch.remainder(index, 128).float() + torch.gather(joff[:, 1], 1, index) + 0.5
 
             # xy: [N_TYPE, K, 2]
             xy = torch.cat([y[..., None], x[..., None]], dim=-1)
