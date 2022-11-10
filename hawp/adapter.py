@@ -26,8 +26,6 @@ from hawp.fsl.config import cfg
 from hawp.fsl.model import build_model
 from line_dataset import LineDataset, collate
 
-warnings.filterwarnings("ignore")
-
 
 class Device(Enum):
     cuda = 0
