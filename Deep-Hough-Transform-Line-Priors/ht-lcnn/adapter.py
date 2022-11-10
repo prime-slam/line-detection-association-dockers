@@ -15,7 +15,6 @@
 import numpy as np
 import random
 import torch
-import warnings
 
 from enum import Enum
 from pathlib import Path
@@ -31,9 +30,6 @@ from lcnn.models.HT import hough_transform
 from lcnn.postprocess import postprocess
 
 
-warnings.filterwarnings("ignore")
-
-
 class Device(Enum):
     cuda = 0
     cpu = 1
@@ -41,18 +37,18 @@ class Device(Enum):
 
 class Adapter:
     def __init__(
-        self,
-        image_path: Path,
-        output_path: Path,
-        lines_output_directory: Path,
-        scores_output_directory: Path,
-        model_config_path: Path,
-        pretrained_model_path: Path,
-        device: Device,
+            self,
+            image_path: Path,
+            output_path: Path,
+            lines_output_directory: Path,
+            scores_output_directory: Path,
+            model_config_path: Path,
+            pretrained_model_path: Path,
+            device: Device,
     ):
         self.image_path = image_path
-        self.lines_path = output_path.joinpath(lines_output_directory)
-        self.scores_path = output_path.joinpath(scores_output_directory)
+        self.lines_path = output_path / lines_output_directory
+        self.scores_path = output_path / scores_output_directory
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
         self.prediction_file_suffix = ".csv"
@@ -112,17 +108,17 @@ class Adapter:
         )
 
     def __save_results(
-        self, file_name: str, lines: np.ndarray, scores: np.ndarray
+            self, file_name: str, lines: np.ndarray, scores: np.ndarray
     ) -> None:
         np.savetxt(
-            self.lines_path.joinpath(file_name).with_suffix(
+            (self.lines_path / file_name).with_suffix(
                 self.prediction_file_suffix
             ),
             lines,
             delimiter=",",
         )
         np.savetxt(
-            self.scores_path.joinpath(file_name).with_suffix(
+            (self.scores_path / file_name).with_suffix(
                 self.prediction_file_suffix
             ),
             scores,
@@ -134,9 +130,9 @@ class Adapter:
             torch.from_numpy(
                 hough_transform(rows=128, cols=128, theta_res=3, rho_res=1)
             )
-            .float()
-            .contiguous()
-            .to(self.device)
+                .float()
+                .contiguous()
+                .to(self.device)
         )
 
         model = hg(
@@ -175,7 +171,7 @@ class Adapter:
         }
 
     def __postprocess_predictions(
-        self, lines: np.ndarray, scores: np.ndarray, metadata: Dict
+            self, lines: np.ndarray, scores: np.ndarray, metadata: Dict
     ) -> Tuple[np.ndarray, np.ndarray]:
         width = metadata["width"]
         height = metadata["height"]
@@ -198,10 +194,6 @@ class Adapter:
                 scores = scores[:i]
                 break
 
-        # postprocess: remove overlapped lines
-        diagonal_length = (height**2 + width**2) ** 0.5
-        lines, scores = postprocess(lines, scores, diagonal_length * 0.01, 0)
-
         # reformat: [[y1, x1], [y2, x2]] -> [x1, y1, x2, y2]
         lines = lines[:, :, ::-1].flatten().reshape((-1, 4))
 
@@ -209,7 +201,7 @@ class Adapter:
 
     @staticmethod
     def __unwrap_results(
-        wrapped_results: Dict[str, torch.Tensor]
+            wrapped_results: Dict[str, torch.Tensor]
     ) -> List[Dict[str, np.ndarray]]:
         batch_size = wrapped_results["lines"].shape[0]
         return [

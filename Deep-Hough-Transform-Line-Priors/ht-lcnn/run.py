@@ -56,7 +56,7 @@ if __name__ == "__main__":
         "-m",
         metavar="PATH",
         help="pretrained model configuration path",
-        default=Path(__file__).resolve().parent.joinpath("config/wireframe.yaml"),
+        default=Path(__file__).resolve().parent / "config/wireframe.yaml",
     )
 
     parser.add_argument(
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         "-M",
         metavar="PATH",
         help="pretrained model path",
-        default=Path(__file__).resolve().parent.joinpath("pretrained/checkpoint.pth.tar"),
+        default=Path(__file__).resolve().parent / "pretrained/checkpoint.pth.tar",
     )
 
     parser.add_argument(
