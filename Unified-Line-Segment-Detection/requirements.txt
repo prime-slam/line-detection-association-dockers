@@ -1,8 +1,0 @@
-opencv-python
-scipy
-matplotlib
-argparse
-yacs
-tqdm
-sklearn
-tensorboardX
