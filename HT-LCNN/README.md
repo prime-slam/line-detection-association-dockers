@@ -13,7 +13,7 @@ To run the container use the following command:
 sudo docker run --rm --gpus=all \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
--v $(realpath ../../common/):/detector/common \
+-v $(realpath ../common/):/detector/common \
 ht-lcnn [OPTIONAL_ARGS]
 ```
 
