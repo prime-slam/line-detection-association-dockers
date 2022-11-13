@@ -1,6 +1,0 @@
-docopt
-matplotlib
-opencv-python
-pyyaml
-scikit-image
-tqdm

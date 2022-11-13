@@ -14,5 +14,5 @@ The following detectors are currently adapted.
 | HAWP    | [Holistically-Attracted Wireframe Parsing: From Supervised to Self-Supervised Learning](https://arxiv.org/abs/2210.12971) | [Code](https://github.com/cherubicXN/hawp) |
 | L-CNN   | [End-to-End Wireframe Parsing](https://arxiv.org/abs/1905.03246) | [Code](https://github.com/zhou13/lcnn) |
 | HT-LCNN | [Deep Hough-Transform Line Priors](https://arxiv.org/abs/2007.09493) | [Code](https://github.com/yanconglin/Deep-Hough-Transform-Line-Priors) |
-| TP-LSD | [TP-LSD: Tri-Points Based Line Segment Detector](https://arxiv.org/abs/2009.05505) | [Code](https://github.com/Siyuada7/TP-LSD) |
+| TP-LSD  | [TP-LSD: Tri-Points Based Line Segment Detector](https://arxiv.org/abs/2009.05505) | [Code](https://github.com/Siyuada7/TP-LSD) |
 | ULSD    | [ULSD: Unified Line Segment Detection across Pinhole, Fisheye, and Spherical Cameras](https://arxiv.org/abs/2011.03174) | [Code](https://github.com/lh9171338/Unified-Line-Segment-Detection) |
