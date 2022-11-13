@@ -1,0 +1,4 @@
+/model/
+/output/
+/.idea/
+*/*/*.pyc
