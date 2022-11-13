@@ -12,8 +12,9 @@ docker build -t tp-lsd .
 To run the container use the following command:
 ```
 sudo docker run --rm --gpus=all \
---mount type=bind,source=<IMAGES_PATH>,target=/detector/input \
---mount type=bind,source=<OUTPUT_PATH>,target=/detector/output \
+-v <IMAGES_PATH>:/detector/input \
+-v <OUTPUT_PATH>:/detector/output \
+-v $(realpath ../common/):/detector/common \
 tp-lsd [OPTIONAL_ARGS]
 ```
 

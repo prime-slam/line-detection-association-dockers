@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cv2
-import numpy as np
-import torch
-
 from pathlib import Path
 from skimage import io
 from torch.utils.data import default_collate, Dataset
-from typing import Tuple
+from typing import Callable
 
-from lcnn.config import M
+from common.image_metadata import ImageMetadata
 
 
 def collate(batch):
@@ -29,31 +25,24 @@ def collate(batch):
 
 
 class LineDataset(Dataset):
-    def __init__(self, data_path: Path, image_rescale: Tuple[int, int] = (512, 512)):
+    def __init__(
+        self,
+        data_path: Path,
+        transform_image: Callable,
+    ):
         files = sorted(data_path.iterdir())
         self.files = files
-        self.image_rescale = image_rescale
+        self.transform_image = transform_image
 
     def __len__(self) -> int:
         return len(self.files)
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, dict]:
+    def __getitem__(self, idx: int):
         path = self.files[idx]
         image_name = path.stem
         image = io.imread(path)
 
         height, width = image.shape[0], image.shape[1]
-        metadata = {"width": width, "height": height, "image_name": image_name}
+        metadata = ImageMetadata(width=width, height=height, image_name=image_name)
 
-        transformed_image = self.__transform_image(image)
-        return torch.from_numpy(transformed_image).float(), metadata
-
-    def __transform_image(self, image: np.ndarray) -> np.ndarray:
-        transformed_image = cv2.resize(image, self.image_rescale)
-        transformed_image = transformed_image.astype(float)[:, :, :3]
-
-        # normalize image
-        transformed_image = (transformed_image - M.image.mean) / M.image.stddev
-        transformed_image = np.rollaxis(transformed_image, 2)
-
-        return transformed_image
+        return self.transform_image(image), metadata

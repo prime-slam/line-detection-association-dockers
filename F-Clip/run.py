@@ -12,55 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
-
-from os import path
 from pathlib import Path
 
 from adapter import Adapter, Device
-
-
-def positive_int(value: str) -> int:
-    try:
-        value = int(value)
-        if value <= 0:
-            raise argparse.ArgumentTypeError(f"{value} is not a positive integer")
-    except ValueError as error:
-        raise argparse.ArgumentTypeError(f"{value} is not an integer") from error
-    return value
-
+from common.parser import create_base_parser, positive_int
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="python run.py",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-
-    parser.add_argument(
-        "--imgs", "-i", metavar="PATH", help="path to images", default="input/"
-    )
-
-    parser.add_argument(
-        "--output", "-o", metavar="PATH", help="output path", default="output/"
-    )
-
-    parser.add_argument(
-        "--lines-dir",
-        "-l",
-        metavar="STRING",
-        dest="lines_dir",
-        help="name of lines output directory",
-        default="lines",
-    )
-
-    parser.add_argument(
-        "--scores-dir",
-        "-s",
-        metavar="STRING",
-        dest="scores_dir",
-        help="name of scores output directory",
-        default="scores",
-    )
+    parser = create_base_parser()
 
     parser.add_argument(
         "--batch",
@@ -77,7 +35,7 @@ if __name__ == "__main__":
         metavar="PATH",
         dest="base_config",
         help="base model configuration path",
-        default=path.join(path.dirname(__file__), "config/base.yaml"),
+        default=Path(__file__).resolve().parent / "config/base.yaml",
     )
 
     parser.add_argument(
@@ -85,7 +43,7 @@ if __name__ == "__main__":
         "-m",
         metavar="PATH",
         help="pretrained model configuration path",
-        default=path.join(path.dirname(__file__), "config/fclip_HR.yaml"),
+        default=Path(__file__).resolve().parent / "config/fclip_HR.yaml",
     )
 
     parser.add_argument(
@@ -93,16 +51,7 @@ if __name__ == "__main__":
         "-M",
         metavar="PATH",
         help="pretrained model path",
-        default=path.join(path.dirname(__file__), "pretrained/HR/checkpoint.pth.tar"),
-    )
-
-    parser.add_argument(
-        "--device",
-        "-d",
-        metavar="STRING",
-        choices=list(map(lambda c: c.name, Device)),
-        help="name of desired execution device",
-        default="cuda",
+        default=Path(__file__).resolve().parent / "pretrained/HR/checkpoint.pth.tar",
     )
 
     args = parser.parse_args()

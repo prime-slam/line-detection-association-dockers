@@ -12,28 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import cv2
 import numpy as np
 import torch
-import warnings
 
-from enum import Enum
 from pathlib import Path
-from typing import Dict, List
+from typing import List, Any
 
-
+from common.adapter_base import DLAdapterBase
+from common.device import Device
+from common.image_metadata import ImageMetadata
+from common.line_dataset import LineDataset, collate
+from common.prediction import Prediction
+from common.transform import unwrap_results
 from FClip.config import C, M
-from FClip.line_dataset import LineDataset, collate
 from test import build_model
 
-warnings.filterwarnings("ignore")
 
-
-class Device(Enum):
-    cuda = 0
-    cpu = 1
-
-
-class Adapter:
+class Adapter(DLAdapterBase):
     def __init__(
         self,
         image_path: Path,
@@ -44,119 +40,91 @@ class Adapter:
         model_config_path: Path,
         pretrained_model_path: Path,
         device: Device,
-        batch_size: Path,
+        batch_size: int,
     ):
-        self.image_path = image_path
-        self.lines_path = output_path.joinpath(lines_output_directory)
-        self.scores_path = output_path.joinpath(scores_output_directory)
+        super().__init__(
+            image_path,
+            output_path,
+            lines_output_directory,
+            scores_output_directory,
+            device,
+        )
         self.base_config_path = base_config_path
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
         self.batch_size = batch_size
-        self.prediction_file_suffix = ".csv"
-
-        if device == Device.cuda:
-            if torch.cuda.is_available():
-                torch.backends.cudnn.deterministic = True
-                torch.cuda.manual_seed(0)
-            else:
-                print("No available cuda device! Fall back on cpu.")
-                device = Device.cpu
-
-        self.device = device.name
         self.__update_configuration()
+        self.heatmap_size = M.resolution
+        self.model_input_size = (512, 512)
 
-    def run(self) -> None:
-        self.lines_path.mkdir(exist_ok=True)
-        self.scores_path.mkdir(exist_ok=True)
+    def _predict(self, model: torch.nn.Module, image: torch.Tensor):
+        return model(
+            {
+                "image": image.to(self.device),
+            },
+            isTest=True,
+        )["heatmaps"]
 
-        image_loader = self.__create_imageloader()
-
-        model = build_model(self.device == "cpu")
-        model.to(self.device)
-        model.eval()
-
-        with torch.no_grad():
-            for image, metadata in image_loader:
-                heatmap_size = M.resolution
-                result = model(
-                    {
-                        "image": image.to(self.device),
-                    },
-                    isTest=True,
-                )
-
-                wrapped_results = result["heatmaps"]
-                results = self.__unwrap_results(wrapped_results)
-
-                for result, meta in zip(results, metadata):
-                    predicted_lines = result["lines"]
-                    scores = result["score"]
-
-                    # reformat: [[y1, x1], [y2, x2]] -> [x1, y1, x2, y2]
-                    predicted_lines = (
-                        predicted_lines[:, :, ::-1].flatten().reshape((-1, 4))
-                    )
-
-                    # rescale: it was predicted on a 128 x 128 heatmap
-                    x_scale = meta["width"] / heatmap_size
-                    y_scale = meta["height"] / heatmap_size
-
-                    x_index = [0, 2]
-                    y_index = [1, 3]
-
-                    predicted_lines[:, x_index] *= x_scale
-                    predicted_lines[:, y_index] *= y_scale
-
-                    self.__save_results(
-                        file_name=meta["image_name"],
-                        lines=predicted_lines,
-                        scores=scores,
-                    )
-
-    def __update_configuration(self) -> None:
-        C.update(C.from_yaml(filename=self.base_config_path))
-        C.update(C.from_yaml(filename=self.model_config_path))
-        M.update(C.model)
-        C.io.model_initialize_file = self.pretrained_model_path
-        C.io.datadir = self.image_path
-
-    def __create_imageloader(self) -> torch.utils.data.DataLoader:
+    def _create_imageloader(self) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
-            LineDataset(Path(C.io.datadir)),
-            batch_size=self.batch_size,
+            LineDataset(Path(self.image_path), self._transform_image),
+            batch_size=1,
             collate_fn=collate,
             num_workers=C.io.num_workers,
             pin_memory=True,
         )
 
-    def __save_results(
-        self, file_name: str, lines: np.ndarray, scores: np.ndarray
-    ) -> None:
-        np.savetxt(
-            self.lines_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
-            lines,
-            delimiter=",",
-        )
-        np.savetxt(
-            self.scores_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
-            scores,
-            delimiter=",",
-        )
+    def _transform_image(self, image: np.ndarray) -> torch.Tensor:
+        transformed_image = cv2.resize(image, self.model_input_size)
+        transformed_image = transformed_image.astype(float)[:, :, :3]
 
-    @staticmethod
-    def __unwrap_results(
-        wrapped_results: Dict[str, torch.Tensor]
-    ) -> List[Dict[str, np.ndarray]]:
-        batch_size = wrapped_results["lines"].shape[0]
-        return [
-            dict(
-                (prediction_name, predictions[i].cpu().numpy())
-                for prediction_name, predictions in wrapped_results.items()
+        # normalize image
+        transformed_image = (transformed_image - M.image.mean) / M.image.stddev
+        transformed_image = np.rollaxis(transformed_image, 2)
+
+        return torch.from_numpy(transformed_image).float()
+
+    def _build_model(self) -> torch.nn.Module:
+        model = build_model(self.device == "cpu")
+        model.to(self.device)
+        model.eval()
+
+        return model
+
+    def _postprocess_predictions(
+        self, raw_predictions: Any, metadata: List[ImageMetadata]
+    ) -> List[Prediction]:
+        batch_size = raw_predictions["lines"].shape[0]
+        predictions = unwrap_results(raw_predictions, batch_size)
+
+        postprocessed_predictions = []
+        for prediction, meta in zip(predictions, metadata):
+            lines = prediction["lines"]
+            scores = prediction["score"]
+
+            width = meta.width
+            height = meta.height
+
+            # reformat: [[y1, x1], [y2, x2]] -> [x1, y1, x2, y2]
+            lines = lines[:, :, ::-1].flatten().reshape((-1, 4))
+
+            # rescale: it was predicted on a 128 x 128 heatmap
+            x_scale = width / self.heatmap_size
+            y_scale = height / self.heatmap_size
+
+            x_index = [0, 2]
+            y_index = [1, 3]
+
+            lines[:, x_index] *= x_scale
+            lines[:, y_index] *= y_scale
+
+            postprocessed_predictions.append(
+                Prediction(lines=lines, scores=scores, metadata=meta)
             )
-            for i in range(batch_size)
-        ]
+
+        return postprocessed_predictions
+
+    def __update_configuration(self) -> None:
+        C.update(C.from_yaml(filename=self.base_config_path))
+        C.update(C.from_yaml(filename=self.model_config_path))
+        M.update(C.model)
