@@ -12,44 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
-
 from pathlib import Path
 
 from adapter import Adapter, Device
-
+from common.parser import create_base_parser
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="python run.py",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-
-    parser.add_argument(
-        "--imgs", "-i", metavar="PATH", help="path to images", default="input/"
-    )
-
-    parser.add_argument(
-        "--output", "-o", metavar="PATH", help="output path", default="output/"
-    )
-
-    parser.add_argument(
-        "--lines-dir",
-        "-l",
-        metavar="STRING",
-        dest="lines_dir",
-        help="name of lines output directory",
-        default="lines",
-    )
-
-    parser.add_argument(
-        "--scores-dir",
-        "-s",
-        metavar="STRING",
-        dest="scores_dir",
-        help="name of scores output directory",
-        default="scores",
-    )
+    parser = create_base_parser()
 
     parser.add_argument(
         "--model-config",
@@ -65,15 +34,6 @@ if __name__ == "__main__":
         metavar="PATH",
         help="pretrained model path",
         default=Path(__file__).resolve().parent / "checkpoints/hawpv2-edb9b23f.pth",
-    )
-
-    parser.add_argument(
-        "--device",
-        "-d",
-        metavar="STRING",
-        choices=list(map(lambda c: c.name, Device)),
-        help="name of desired execution device",
-        default="cuda",
     )
 
     args = parser.parse_args()

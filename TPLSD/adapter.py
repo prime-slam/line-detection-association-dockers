@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import cv2
 import numpy as np
 import torch
 
-from enum import Enum
 from pathlib import Path
-from tqdm import tqdm
+from typing import List, Any
 
-from dataset.line_dataset import LineDataset, collate
+from common.adapter_base import DLAdapterBase
+from common.device import Device
+from common.image_metadata import ImageMetadata
+from common.line_dataset import LineDataset, collate
+from common.prediction import Prediction
 from model import ModelConfig
 from utils.reconstruct import TPS_line
 from utils.utils import load_model
 
 
-class Device(Enum):
-    cuda = 0
-    cpu = 1
-
-
-class Adapter:
+class Adapter(DLAdapterBase):
     def __init__(
         self,
         image_path: Path,
@@ -42,28 +41,52 @@ class Adapter:
         device: Device,
         batch_size: int,
     ):
-        self.image_path = image_path
-        self.lines_path = output_path.joinpath(lines_output_directory)
-        self.scores_path = output_path.joinpath(scores_output_directory)
+        super().__init__(
+            image_path,
+            output_path,
+            lines_output_directory,
+            scores_output_directory,
+            device,
+        )
         self.batch_size = batch_size
         self.pretrained_model_path = pretrained_model_path
-        self.prediction_file_suffix = ".csv"
         self.model_config = model_config
 
-        if device == Device.cuda:
-            if torch.cuda.is_available():
-                torch.backends.cudnn.deterministic = True
-                torch.cuda.manual_seed(0)
-            else:
-                print("No available cuda device! Fall back on cpu.")
-                device = Device.cpu
+    def _predict(self, model: torch.nn.Module, image: torch.Tensor):
+        return model(image)[-1]
 
-        self.device = device.name
+    def _create_imageloader(self) -> torch.utils.data.DataLoader:
+        return torch.utils.data.DataLoader(
+            LineDataset(self.image_path, self._transform_image),
+            batch_size=self.batch_size,
+            shuffle=False,
+            pin_memory=True,
+            collate_fn=collate,
+        )
 
-    def run(self) -> None:
-        self.lines_path.mkdir(exist_ok=True)
-        self.scores_path.mkdir(exist_ok=True)
+    def _transform_image(self, image: np.ndarray) -> torch.Tensor:
+        transformed = cv2.resize(image, self.model_config.input_resolution)
+        height, width, channels = transformed.shape
+        hsv = cv2.cvtColor(transformed, cv2.COLOR_BGR2HSV)
+        imgv0 = hsv[..., 2]
+        imgv = cv2.resize(
+            imgv0, (0, 0), fx=1.0 / 4, fy=1.0 / 4, interpolation=cv2.INTER_LINEAR
+        )
+        imgv = cv2.GaussianBlur(imgv, (5, 5), 3)
+        imgv = cv2.resize(imgv, (width, height), interpolation=cv2.INTER_LINEAR)
+        imgv = cv2.GaussianBlur(imgv, (5, 5), 3)
 
+        imgv1 = imgv0.astype(np.float32) - imgv + 127.5
+        imgv1 = np.clip(imgv1, 0, 255).astype(np.uint8)
+        hsv[..., 2] = imgv1
+        transformed = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
+        transformed = transformed.astype(np.float32) / 255.0
+        transformed = transformed.transpose(2, 0, 1)
+
+        return transformed
+
+    def _build_model(self) -> torch.nn.Module:
         model = load_model(
             self.model_config.model(self.model_config.head),
             self.pretrained_model_path,
@@ -71,22 +94,24 @@ class Adapter:
             selftrain=False,
         )
 
-        model = model.cuda()
+        model = model.to(self.device)
         model.eval()
 
-        image_loader = self.__create_imageloader()
+        return model
 
-        with torch.no_grad():
-            for image, metadata in tqdm(image_loader):
-                wrapped_results = model(image.cuda())[-1]
-                results = self.__unwrap_results(wrapped_results)
-                for result, meta in zip(results, metadata):
-                    lines, scores = self.__get_predictions(result, meta)
-                    self.__save_results(
-                        file_name=f"{meta['image_name']}.csv",
-                        lines=lines,
-                        scores=scores,
-                    )
+    def _postprocess_predictions(
+        self, raw_predictions: Any, metadata: List[ImageMetadata]
+    ) -> List[Prediction]:
+        predictions = self.__unwrap_predictions(raw_predictions)
+
+        postprocessed_predictions = []
+        for prediction, meta in zip(predictions, metadata):
+            lines, scores = self.__get_predictions(prediction, meta)
+            postprocessed_predictions.append(
+                Prediction(lines=lines, scores=scores, metadata=meta)
+            )
+
+        return postprocessed_predictions
 
     def __get_predictions(self, model_output, meta):
         heatmap_height, heatmap_width = self.model_config.output_resolution
@@ -97,8 +122,8 @@ class Adapter:
         pos_mat = pos.astype(int)
         scores = center[pos_mat[:, 1], pos_mat[:, 0]].tolist() if pos_mat.any() else []
 
-        x_scale = meta["width"] / heatmap_height
-        y_scale = meta["height"] / heatmap_width
+        x_scale = meta.width / heatmap_height
+        y_scale = meta.height / heatmap_width
 
         x_index = [0, 2]
         y_index = [1, 3]
@@ -108,35 +133,8 @@ class Adapter:
 
         return lines, scores
 
-    def __save_results(
-        self, file_name: str, lines: np.ndarray, scores: np.ndarray
-    ) -> None:
-        np.savetxt(
-            self.lines_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
-            lines,
-            delimiter=",",
-        )
-        np.savetxt(
-            self.scores_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
-            scores,
-            delimiter=",",
-        )
-
-    def __create_imageloader(self) -> torch.utils.data.DataLoader:
-        return torch.utils.data.DataLoader(
-            LineDataset(self.image_path, self.model_config.input_resolution),
-            batch_size=self.batch_size,
-            shuffle=False,
-            pin_memory=True,
-            collate_fn=collate,
-        )
-
     @staticmethod
-    def __unwrap_results(wrapped_results):
+    def __unwrap_predictions(wrapped_results):
         batch_size = wrapped_results["line"].shape[0]
         return [
             dict((k, v[i][None, :]) for k, v in wrapped_results.items())

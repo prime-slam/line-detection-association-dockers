@@ -12,27 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import cv2
 import numpy as np
 import torch
-import random
-import warnings
 
-from enum import Enum
 from pathlib import Path
-from tqdm import tqdm
-from typing import Dict
+from torchvision.transforms import functional as F
+from typing import List, Any
 
+from common.adapter_base import DLAdapterBase
+from common.device import Device
+from common.image_metadata import ImageMetadata
+from common.line_dataset import LineDataset, collate
+from common.prediction import Prediction
 from hawp.fsl.config import cfg
 from hawp.fsl.model import build_model
-from line_dataset import LineDataset, collate
 
 
-class Device(Enum):
-    cuda = 0
-    cpu = 1
-
-
-class Adapter:
+class Adapter(DLAdapterBase):
     def __init__(
         self,
         image_path: Path,
@@ -43,97 +40,72 @@ class Adapter:
         pretrained_model_path: Path,
         device: Device,
     ):
-        self.image_path = image_path
-        self.lines_path = output_path / lines_output_directory
-        self.scores_path = output_path / scores_output_directory
+        super().__init__(
+            image_path,
+            output_path,
+            lines_output_directory,
+            scores_output_directory,
+            device,
+        )
         self.model_config_path = model_config_path
         self.pretrained_model_path = pretrained_model_path
-        self.prediction_file_suffix = ".csv"
         self.batch_size = 1  # model returns result for batch_size = 1
-
-        if device == Device.cuda:
-            if torch.cuda.is_available():
-                random.seed(0)
-                np.random.seed(0)
-                torch.manual_seed(0)
-            else:
-                print("No available cuda device! Fall back on cpu.")
-                device = Device.cpu
-
-        self.device = device.name
         self.__update_configuration()
 
-    def run(self) -> None:
-        self.lines_path.mkdir(exist_ok=True)
-        self.scores_path.mkdir(exist_ok=True)
+    def _predict(self, model: torch.nn.Module, image: torch.Tensor):
+        predictions, _ = model(*self.__create_model_input(image))
+        return predictions
 
-        image_loader = self.__create_imageloader()
-
-        model = self.__build_model()
-        model.eval()
-
-        with torch.no_grad():
-            for image, metadata in tqdm(image_loader):
-                meta = metadata[0]
-                result, _ = model(*self.__create_model_input(image, meta))
-
-                lines = result["lines_pred"].cpu().numpy()
-                scores = result["lines_score"].cpu().numpy()
-
-                lines = self.__postprocess_lines(lines, meta)
-
-                self.__save_results(
-                    file_name=meta["image_name"],
-                    lines=lines,
-                    scores=scores,
-                )
-
-    def __update_configuration(self) -> None:
-        cfg.merge_from_file(self.model_config_path)
-
-    def __create_imageloader(self) -> torch.utils.data.DataLoader:
+    def _create_imageloader(self) -> torch.utils.data.DataLoader:
         return torch.utils.data.DataLoader(
-            LineDataset(Path(self.image_path)),
+            LineDataset(Path(self.image_path), self._transform_image),
             batch_size=self.batch_size,
             collate_fn=collate,
             pin_memory=True,
         )
 
-    def __save_results(
-        self, file_name: str, lines: np.ndarray, scores: np.ndarray
-    ) -> None:
-        np.savetxt(
-            (self.lines_path / file_name).with_suffix(self.prediction_file_suffix),
-            lines,
-            delimiter=",",
+    def _transform_image(self, image: np.ndarray) -> torch.Tensor:
+        transformed = image.astype("float32")[:, :, :3]
+        transformed = cv2.resize(
+            transformed,
+            (
+                cfg.DATASETS.IMAGE.HEIGHT,
+                cfg.DATASETS.IMAGE.WIDTH,
+            ),
         )
-        np.savetxt(
-            (self.scores_path / file_name).with_suffix(self.prediction_file_suffix),
-            scores,
-            delimiter=",",
+        transformed = F.to_tensor(transformed)
+
+        if not cfg.DATASETS.IMAGE.TO_255:
+            transformed /= 255.0
+
+        transformed = F.normalize(
+            transformed,
+            mean=cfg.DATASETS.IMAGE.PIXEL_MEAN,
+            std=cfg.DATASETS.IMAGE.PIXEL_STD,
         )
 
-    def __build_model(self) -> torch.nn.Module:
+        return transformed
+
+    def _build_model(self) -> torch.nn.Module:
         model = build_model(cfg)
         model.to(self.device)
 
         checkpoint = torch.load(self.pretrained_model_path, map_location=self.device)
         model.load_state_dict(checkpoint["model"])
+        model.eval()
 
         return model
 
-    def __create_model_input(self, image: torch.Tensor, meta: Dict):
-        return image.to(self.device), [
-            {
-                "width": cfg.DATASETS.IMAGE.WIDTH,
-                "height": cfg.DATASETS.IMAGE.HEIGHT,
-                "filename": meta["image_name"],
-            }
-        ]
+    def _postprocess_predictions(
+        self, raw_predictions: Any, metadata: List[ImageMetadata]
+    ) -> List[Prediction]:
+        metadata = metadata[0]
 
-    def __postprocess_lines(self, lines: np.ndarray, metadata: Dict) -> np.ndarray:
-        width = metadata["width"]
-        height = metadata["height"]
+        lines = raw_predictions["lines_pred"].cpu().numpy()
+        scores = raw_predictions["lines_score"].cpu().numpy()
+
+        width = metadata.width
+        height = metadata.height
 
         # rescale
         x_scale = width / cfg.DATASETS.IMAGE.WIDTH
@@ -145,4 +117,16 @@ class Adapter:
         lines[:, x_index] *= x_scale
         lines[:, y_index] *= y_scale
 
-        return lines
+        return [Prediction(lines=lines, scores=scores, metadata=metadata)]
+
+    def __update_configuration(self) -> None:
+        cfg.merge_from_file(self.model_config_path)
+
+    def __create_model_input(self, image: torch.Tensor):
+        return image.to(self.device), [
+            {
+                "width": cfg.DATASETS.IMAGE.WIDTH,
+                "height": cfg.DATASETS.IMAGE.HEIGHT,
+                "filename": "",
+            }
+        ]
