@@ -8,10 +8,11 @@ This folder contains adapters for [TP-LSD](https://github.com/Siyuada7/TP-LSD/) 
 ```
 docker build -t tp-lsd .
 ```
+Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
 To run the container use the following command:
 ```
-sudo docker run --rm --gpus=all \
+docker run --rm --gpus=all \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
 -v $(realpath ../common/):/detector/common \
