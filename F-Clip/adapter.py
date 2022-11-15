@@ -128,3 +128,4 @@ class Adapter(DLAdapterBase):
         C.update(C.from_yaml(filename=self.base_config_path))
         C.update(C.from_yaml(filename=self.model_config_path))
         M.update(C.model)
+        C.io.model_initialize_file = self.pretrained_model_path
