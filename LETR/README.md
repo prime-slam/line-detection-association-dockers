@@ -5,7 +5,7 @@ This folder contains adapters for [LETR](https://github.com/mlpc-ucsd/LETR) and 
 2) Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) on your host machine.
 3) Build docker image using `Dockerfile`:
 ```
-docker build -t ulsd .
+docker build -t letr .
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
