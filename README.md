@@ -17,3 +17,4 @@ The following detectors are currently adapted.
 | TP-LSD  | [TP-LSD: Tri-Points Based Line Segment Detector](https://arxiv.org/abs/2009.05505) | [Code](https://github.com/Siyuada7/TP-LSD) |
 | ULSD    | [ULSD: Unified Line Segment Detection across Pinhole, Fisheye, and Spherical Cameras](https://arxiv.org/abs/2011.03174) | [Code](https://github.com/lh9171338/Unified-Line-Segment-Detection) |
 | LETR    | [Line Segment Detection Using Transformers without Edges](https://arxiv.org/abs/2101.01909) | [Code](https://github.com/mlpc-ucsd/LETR) |
+| M-LSD   | [Towards Light-weight and Real-time Line Segment Detection](https://arxiv.org/abs/2106.00186) | [Code](https://github.com/navervision/mlsd) |
