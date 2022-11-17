@@ -14,7 +14,8 @@
 
 from pathlib import Path
 from skimage import io
-from torch.utils.data import default_collate, Dataset
+from torch.utils.data import Dataset
+from torch.utils.data.dataloader import default_collate
 from typing import Callable
 
 from common.image_metadata import ImageMetadata
