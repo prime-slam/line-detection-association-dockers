@@ -1,8 +1,9 @@
-opencv-python
-scipy
-matplotlib
 argparse
-yacs
-tqdm
+matplotlib
+opencv-python
+scikit-image
+scipy
 sklearn
 tensorboardX
+tqdm
+yacs
