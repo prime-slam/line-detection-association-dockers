@@ -34,7 +34,7 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # download pretrained models
 RUN mkdir pretrained \
-    && wget https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.zip -O checkpoint.zip \
+    && wget $MODEL_PATH -O checkpoint.zip \
     && unzip checkpoint.zip \
     && mv exp/res101_stage2_focal/checkpoints/checkpoint0024.pth pretrained/checkpoint.pth \
     && rm -rf exp checkpoint.zip
