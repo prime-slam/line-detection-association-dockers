@@ -36,6 +36,6 @@ optional arguments:
   --model PATH, -M PATH
                         pretrained model path (default: checkpoints/hawpv2-edb9b23f.pth)
   --device STRING, -d STRING
-                        name of desired execution device (default: cuda)
+                        name of desired execution device: gpu or cpu (default: gpu)
 
 ```
