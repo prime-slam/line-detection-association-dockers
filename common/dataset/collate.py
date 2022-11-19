@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
+from torch.utils.data import default_collate
 
 
-class Device(Enum):
-    gpu = 0
-    cpu = 1
+def collate(batch):
+    return default_collate([elem[0] for elem in batch]), [elem[1] for elem in batch]

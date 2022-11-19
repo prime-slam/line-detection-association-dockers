@@ -19,17 +19,18 @@ import torch
 from pathlib import Path
 from typing import List, Any
 
-from common.adapter_base import DLAdapterBase
+from common.adapter.torch_adapter import TorchAdapter
 from common.device import Device
 from common.image_metadata import ImageMetadata
-from common.line_dataset import LineDataset, collate
+from common.dataset.collate import collate
+from common.dataset.line_dataset import LineDataset
 from common.prediction import Prediction
 from model import ModelConfig
 from utils.reconstruct import TPS_line
 from utils.utils import load_model
 
 
-class Adapter(DLAdapterBase):
+class Adapter(TorchAdapter):
     def __init__(
         self,
         image_path: Path,

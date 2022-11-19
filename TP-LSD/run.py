@@ -14,7 +14,8 @@
 
 from pathlib import Path
 
-from adapter import Adapter, Device
+from adapter import Adapter
+from common.device import Device
 from common.parser import create_base_parser, positive_int
 from model import Model
 

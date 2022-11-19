@@ -14,18 +14,12 @@
 
 from pathlib import Path
 from skimage import io
-from torch.utils.data import Dataset
-from torch.utils.data.dataloader import default_collate
 from typing import Callable
 
 from common.image_metadata import ImageMetadata
 
 
-def collate(batch):
-    return (default_collate([elem[0] for elem in batch]), [elem[1] for elem in batch])
-
-
-class LineDataset(Dataset):
+class LineDataset:
     def __init__(
         self,
         data_path: Path,

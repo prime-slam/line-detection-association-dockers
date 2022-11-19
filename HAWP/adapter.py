@@ -20,16 +20,17 @@ from pathlib import Path
 from torchvision.transforms import functional as F
 from typing import List, Any
 
-from common.adapter_base import DLAdapterBase
+from common.adapter.torch_adapter import TorchAdapter
 from common.device import Device
 from common.image_metadata import ImageMetadata
-from common.line_dataset import LineDataset, collate
+from common.dataset.collate import collate
+from common.dataset.line_dataset import LineDataset
 from common.prediction import Prediction
 from hawp.fsl.config import cfg
 from hawp.fsl.model import build_model
 
 
-class Adapter(DLAdapterBase):
+class Adapter(TorchAdapter):
     def __init__(
         self,
         image_path: Path,

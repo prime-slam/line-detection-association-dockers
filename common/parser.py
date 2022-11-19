@@ -65,7 +65,7 @@ def create_base_parser():
         metavar="STRING",
         choices=list(map(lambda c: c.name, Device)),
         help="name of desired execution device",
-        default="cuda",
+        default="gpu",
     )
 
     return parser

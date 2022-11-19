@@ -37,6 +37,6 @@ optional arguments:
                         pretrained model path (default: pretraineds/HR/checkpoint.pth.tar)
   --model STR, -M STR   Name of model: TPLSD, TPLSD_Lite, TPLSD_512 or Hourglass (default: TPLSD)
   --device STRING, -d STRING
-                        name of desired execution device: cuda or cpu (default: cuda)
+                        name of desired execution device: gpu or cpu (default: gpu)
 
 ```

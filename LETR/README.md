@@ -32,7 +32,7 @@ optional arguments:
   --scores-dir STRING, -s STRING
                         name of scores output directory (default: scores)
   --device STRING, -d STRING
-                        name of desired execution device (default: cuda)
+                        name of desired execution device: gpu or cpu (default: gpu)
   --batch NUM, -b NUM   dataloader batch size (default: 1)
   --model-config PATH, -m PATH
                         pretrained model configuration path (default:
