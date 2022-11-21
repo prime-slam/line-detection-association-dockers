@@ -19,3 +19,4 @@ The following detectors are currently adapted.
 | LETR    | [Line Segment Detection Using Transformers without Edges](https://arxiv.org/abs/2101.01909) | [Code](https://github.com/mlpc-ucsd/LETR) |
 | M-LSD   | [Towards Light-weight and Real-time Line Segment Detection](https://arxiv.org/abs/2106.00186) | [Code](https://github.com/navervision/mlsd) |
 | AFM     | [Learning Attraction Field Representation for Robust Line Segment Detection](https://arxiv.org/abs/1812.02122) | [Code](https://github.com/cherubicXN/afm_cvpr2019) |
+| LSDNet  | [LSDNet: Trainable Modification of LSD Algorithm for Real-Time Line Segment Detection](https://arxiv.org/abs/2209.04642) | [Code](https://github.com/iitpvisionlab/LSDNet) |
