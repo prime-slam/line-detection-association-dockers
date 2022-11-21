@@ -20,11 +20,11 @@ from abc import ABC
 from pathlib import Path
 from tqdm import tqdm
 
-from common.adapter.adapter_base import DLAdapterBase
+from common.adapter.adapter_base import AdapterBase
 from common.device import Device
 
 
-class TorchAdapter(DLAdapterBase, ABC):
+class TorchAdapter(AdapterBase, ABC):
     def __init__(
         self,
         image_path: Path,
@@ -50,9 +50,6 @@ class TorchAdapter(DLAdapterBase, ABC):
         self.device = device_name
 
     def run(self) -> None:
-        self.lines_path.mkdir(exist_ok=True)
-        self.scores_path.mkdir(exist_ok=True)
-
         image_loader = self._create_imageloader()
         model = self._build_model()
 
