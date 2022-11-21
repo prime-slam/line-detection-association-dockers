@@ -18,3 +18,4 @@ The following detectors are currently adapted.
 | ULSD    | [ULSD: Unified Line Segment Detection across Pinhole, Fisheye, and Spherical Cameras](https://arxiv.org/abs/2011.03174) | [Code](https://github.com/lh9171338/Unified-Line-Segment-Detection) |
 | LETR    | [Line Segment Detection Using Transformers without Edges](https://arxiv.org/abs/2101.01909) | [Code](https://github.com/mlpc-ucsd/LETR) |
 | M-LSD   | [Towards Light-weight and Real-time Line Segment Detection](https://arxiv.org/abs/2106.00186) | [Code](https://github.com/navervision/mlsd) |
+| AFM     | [Learning Attraction Field Representation for Robust Line Segment Detection](https://arxiv.org/abs/1812.02122) | [Code](https://github.com/cherubicXN/afm_cvpr2019) |
