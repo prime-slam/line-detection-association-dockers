@@ -14,17 +14,31 @@
 
 import argparse
 
+from numbers import Number
+
 from common.device import Device
 
 
-def positive_int(value: str) -> int:
+def positive_number(value: str, numeric_type: type) -> Number:
     try:
-        value = int(value)
+        value = numeric_type(value)
         if value <= 0:
-            raise argparse.ArgumentTypeError(f"{value} is not a positive integer")
+            raise argparse.ArgumentTypeError(
+                f"{value} is not a positive {numeric_type.__name__}"
+            )
     except ValueError as error:
-        raise argparse.ArgumentTypeError(f"{value} is not an integer") from error
+        raise argparse.ArgumentTypeError(
+            f"{value} is not {numeric_type.__name__}"
+        ) from error
     return value
+
+
+def positive_int(value: str) -> Number:
+    return positive_number(value, int)
+
+
+def positive_float(value: str) -> Number:
+    return positive_number(value, float)
 
 
 def create_base_parser():
@@ -59,6 +73,11 @@ def create_base_parser():
         default="scores",
     )
 
+    return parser
+
+
+def create_dl_base_parser():
+    parser = create_base_parser()
     parser.add_argument(
         "--device",
         "-d",

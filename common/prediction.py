@@ -15,6 +15,7 @@
 import numpy as np
 
 from dataclasses import dataclass
+from typing import Optional
 
 from common.image_metadata import ImageMetadata
 
@@ -22,5 +23,5 @@ from common.image_metadata import ImageMetadata
 @dataclass
 class Prediction:
     lines: np.ndarray
-    scores: np.ndarray
+    scores: Optional[np.ndarray]
     metadata: ImageMetadata

@@ -16,10 +16,10 @@ from pathlib import Path
 
 from adapter import Adapter
 from common.device import Device
-from common.parser import create_base_parser, positive_int
+from common.parser import create_dl_base_parser, positive_int
 
 if __name__ == "__main__":
-    parser = create_base_parser()
+    parser = create_dl_base_parser()
 
     parser.add_argument(
         "--batch",

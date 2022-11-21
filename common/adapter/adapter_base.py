@@ -21,7 +21,7 @@ from typing import Dict, List, Any
 from common.prediction import Prediction
 
 
-class DLAdapterBase(ABC):
+class AdapterBase(ABC):
     """Base adapter for deep learning line detector"""
 
     def __init__(
@@ -37,6 +37,7 @@ class DLAdapterBase(ABC):
         self.prediction_file_suffix = ".csv"
 
     def _save_prediction(self, prediction: Prediction) -> None:
+        self.lines_path.mkdir(parents=True, exist_ok=True)
         file_name = prediction.metadata.image_name
         np.savetxt(
             self.lines_path.joinpath(file_name).with_suffix(
@@ -45,13 +46,15 @@ class DLAdapterBase(ABC):
             prediction.lines,
             delimiter=",",
         )
-        np.savetxt(
-            self.scores_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
-            prediction.scores,
-            delimiter=",",
-        )
+        if prediction.scores is not None:
+            self.scores_path.mkdir(parents=True, exist_ok=True)
+            np.savetxt(
+                self.scores_path.joinpath(file_name).with_suffix(
+                    self.prediction_file_suffix
+                ),
+                prediction.scores,
+                delimiter=",",
+            )
 
     @abstractmethod
     def run(self) -> None:
