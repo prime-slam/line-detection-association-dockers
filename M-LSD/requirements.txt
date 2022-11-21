@@ -1,6 +1,6 @@
+gradio
 numpy
 opencv-python
 pillow
-tensorflow-gpu=2.3.0
 Flask
-gradio
+scikit-image
