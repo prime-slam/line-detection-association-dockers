@@ -13,10 +13,10 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
-PROJECTROOT = Path("/home/devel/lsdnet/")
+PROJECTROOT = Path(__file__).resolve().parent.parent
 
 
-class SegmentDector:
+class SegmentDetector:
     """
     detects segments in one image
     """
@@ -92,7 +92,7 @@ def detect_and_save(input_path: str, out_path: str, model_path: str):
     model_path --  onnx neural network name to use in detection
     """
 
-    sd = SegmentDector(model_path)
+    sd = SegmentDetector(model_path)
 
     if os.path.isdir(input_path):
         directory_content_paths = [
