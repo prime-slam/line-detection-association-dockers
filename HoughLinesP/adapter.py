@@ -38,7 +38,7 @@ class Adapter(CommonAdapter):
             lines_output_directory,
             scores_output_directory,
         )
-        # default thresholds
+        # thresholds as in opencv example
         self.canny_first_threshold = 50
         self.canny_second_threshold = 200
         self.canny_kernel_size = 3
@@ -46,7 +46,7 @@ class Adapter(CommonAdapter):
         self.rho = 1
         self.theta = np.pi / 180
         self.hough_threshold = 80
-        self.min_line_length = 10
+        self.min_line_length = 30
         self.max_line_gap = 10
 
     def _predict(self, model, image: np.ndarray):
