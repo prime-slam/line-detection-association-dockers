@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 from common.adapter.common_adapter import CommonAdapter
 from common.image_metadata import ImageMetadata
@@ -30,7 +30,7 @@ class Adapter(CommonAdapter):
         image_path: Path,
         output_path: Path,
         lines_output_directory: Path,
-        scores_output_directory: Path,
+        scores_output_directory: Optional[Path],
     ):
         super().__init__(
             image_path,
@@ -38,27 +38,46 @@ class Adapter(CommonAdapter):
             lines_output_directory,
             scores_output_directory,
         )
+        # thresholds as in opencv example
+        self.canny_first_threshold = 50
+        self.canny_second_threshold = 200
+        self.canny_kernel_size = 3
+
+        self.rho = 1
+        self.theta = np.pi / 180
+        self.hough_threshold = 80
+        self.min_line_length = 30
+        self.max_line_gap = 10
 
     def _predict(self, model, image: np.ndarray):
-        return model.detect(image)
+        return cv2.HoughLinesP(
+            image,
+            rho=self.rho,
+            theta=self.theta,
+            threshold=self.hough_threshold,
+            minLineLength=self.min_line_length,
+            maxLineGap=self.max_line_gap,
+        )
 
     def _create_imageloader(self) -> LineDataset:
-        return LineDataset(self.image_path, self._transform_image)
+        return LineDataset(Path(self.image_path), self._transform_image)
 
     def _transform_image(self, image: np.ndarray) -> np.ndarray:
         transformed = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-
+        transformed = cv2.Canny(
+            transformed,
+            self.canny_first_threshold,
+            self.canny_second_threshold,
+            self.canny_kernel_size,
+        )
         return transformed
 
     def _build_model(self):
-        return cv2.createLineSegmentDetector(cv2.LSD_REFINE_ADV)
+        pass
 
     def _postprocess_predictions(
         self, raw_predictions: Any, metadata: ImageMetadata
     ) -> List[Prediction]:
-        lines, _, _, scores = raw_predictions
+        lines = raw_predictions.flatten().reshape(-1, 4)
 
-        lines = lines.flatten().reshape(-1, 4)
-        scores = scores.flatten()
-
-        return [Prediction(lines=lines, scores=scores, metadata=metadata)]
+        return [Prediction(lines=lines, scores=None, metadata=metadata)]
