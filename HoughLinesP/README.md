@@ -27,6 +27,4 @@ optional arguments:
                         output path (default: output/)
   --lines-dir STRING, -l STRING
                         name of lines output directory (default: lines)
-  --scores-dir STRING, -s STRING
-                        name of scores output directory (default: scores)
 ```
