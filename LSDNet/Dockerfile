@@ -2,6 +2,8 @@ FROM nvidia/cuda:11.3.0-cudnn8-devel-ubuntu20.04
 
 ARG OPENCV_VERSION=4.5.2
 
+ARG CMAKE_VERSION=3.19.7
+
 # install dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -y \
     build-essential \
@@ -23,10 +25,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --fix-missi
     libxrender1 \
     libxvidcore-dev \
     locales \
-    ninja-build \
-    python3-dev \
     python3-pip \
-    sudo \
     unzip \
     wget \
     yasm \
@@ -34,8 +33,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --fix-missi
     && locale-gen "en_US.UTF-8"
 
 # install cmake
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-Linux-x86_64.sh && \
-    sh cmake-3.19.7-Linux-x86_64.sh --skip-license --prefix=/usr/local
+RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
+    sh cmake-${CMAKE_VERSION}-Linux-x86_64.sh --skip-license --prefix=/usr/local
 
 # install opencv
 RUN wget -O opencv-${OPENCV_VERSION}.zip https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
@@ -74,13 +73,12 @@ WORKDIR /detector
 
 COPY devops/requirements.txt requirements.txt
 
-RUN pip3 install -r requirements.txt --no-cache-dir
+RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
 COPY . .
 
 # Build cpp project
-RUN cd line_extracter \
-    && cd cmake-build-release \
+RUN cd line_extracter/cmake-build-release \
     && cmake .. -DCMAKE_BUILD_TYPE=Release \
     && make -j4
 
