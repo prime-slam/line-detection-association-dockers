@@ -18,7 +18,7 @@ from adapter import Adapter
 from common.parser import create_base_parser, positive_int, positive_float
 
 if __name__ == "__main__":
-    parser = create_base_parser()
+    parser = create_base_parser(with_score_directory=False)
 
     parser.add_argument(
         "--kernel",
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         image_path=Path(args.imgs),
         output_path=Path(args.output),
         lines_output_directory=Path(args.lines_dir),
-        scores_output_directory=Path(args.scores_dir),
+        scores_output_directory=None,
         sigma=args.sigma,
         kernel_size=args.kernel,
     ).run()

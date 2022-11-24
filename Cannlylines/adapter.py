@@ -17,7 +17,7 @@ import numpy as np
 
 from cannyline import MetaLine
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 from common.adapter.common_adapter import CommonAdapter
 from common.image_metadata import ImageMetadata
@@ -31,7 +31,7 @@ class Adapter(CommonAdapter):
         image_path: Path,
         output_path: Path,
         lines_output_directory: Path,
-        scores_output_directory: Path,
+        scores_output_directory: Optional[Path],
         sigma: float,
         kernel_size: int,
     ):
