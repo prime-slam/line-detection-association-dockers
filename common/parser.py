@@ -41,7 +41,7 @@ def positive_float(value: str) -> Number:
     return positive_number(value, float)
 
 
-def create_base_parser():
+def create_base_parser(with_score_directory: bool = True):
     parser = argparse.ArgumentParser(
         prog="python run.py",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -64,20 +64,21 @@ def create_base_parser():
         default="lines",
     )
 
-    parser.add_argument(
-        "--scores-dir",
-        "-s",
-        metavar="STRING",
-        dest="scores_dir",
-        help="name of scores output directory",
-        default="scores",
-    )
+    if with_score_directory:
+        parser.add_argument(
+            "--scores-dir",
+            "-s",
+            metavar="STRING",
+            dest="scores_dir",
+            help="name of scores output directory",
+            default="scores",
+        )
 
     return parser
 
 
-def create_dl_base_parser():
-    parser = create_base_parser()
+def create_dl_base_parser(with_score_directory: bool = True):
+    parser = create_base_parser(with_score_directory)
     parser.add_argument(
         "--device",
         "-d",

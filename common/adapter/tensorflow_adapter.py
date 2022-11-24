@@ -17,6 +17,7 @@ import tensorflow as tf
 from abc import ABC
 from pathlib import Path
 from tqdm import tqdm
+from typing import Optional
 
 from common.adapter.adapter_base import AdapterBase
 from common.device import Device
@@ -28,7 +29,7 @@ class TensorflowAdapter(AdapterBase, ABC):
         image_path: Path,
         output_path: Path,
         lines_output_directory: Path,
-        scores_output_directory: Path,
+        scores_output_directory: Optional[Path],
         device: Device,
     ):
         super().__init__(
