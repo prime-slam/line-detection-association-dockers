@@ -38,6 +38,7 @@ class Adapter(CommonAdapter):
             lines_output_directory,
             scores_output_directory,
         )
+        # default thresholds
         self.canny_first_threshold = 50
         self.canny_second_threshold = 200
         self.canny_kernel_size = 3
