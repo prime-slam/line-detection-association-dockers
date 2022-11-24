@@ -1,4 +1,0 @@
-numpy
-opencv-python
-scikit-image
-tqdm
