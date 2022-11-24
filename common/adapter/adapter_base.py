@@ -16,7 +16,7 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 from common.prediction import Prediction
 
@@ -29,11 +29,13 @@ class AdapterBase(ABC):
         image_path: Path,
         output_path: Path,
         lines_output_directory: Path,
-        scores_output_directory: Path,
+        scores_output_directory: Optional[Path],
     ):
         self.image_path = image_path
         self.lines_path = output_path / lines_output_directory
-        self.scores_path = output_path / scores_output_directory
+        self.scores_path = (
+            output_path / scores_output_directory if scores_output_directory else None
+        )
         self.prediction_file_suffix = ".csv"
 
     def _save_prediction(self, prediction: Prediction) -> None:
@@ -46,7 +48,7 @@ class AdapterBase(ABC):
             prediction.lines,
             delimiter=",",
         )
-        if prediction.scores is not None:
+        if self.scores_path:
             self.scores_path.mkdir(parents=True, exist_ok=True)
             np.savetxt(
                 self.scores_path.joinpath(file_name).with_suffix(

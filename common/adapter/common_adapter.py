@@ -15,6 +15,7 @@
 from abc import ABC
 from pathlib import Path
 from tqdm import tqdm
+from typing import Optional
 
 from common.adapter.adapter_base import AdapterBase
 
@@ -25,7 +26,7 @@ class CommonAdapter(AdapterBase, ABC):
         image_path: Path,
         output_path: Path,
         lines_output_directory: Path,
-        scores_output_directory: Path,
+        scores_output_directory: Optional[Path],
     ):
         super().__init__(
             image_path, output_path, lines_output_directory, scores_output_directory
