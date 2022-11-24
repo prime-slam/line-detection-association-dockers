@@ -1,4 +1,4 @@
-# EDLines Docker Image
+# HoughLinesP Docker Image
 This folder contains adapters for [HoughLinesP](https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga8618180a5948286384e3b7ca02f6feeb) and a docker image
 ## Building Docker Image
 Build docker image using `Dockerfile`:
@@ -27,4 +27,6 @@ optional arguments:
                         output path (default: output/)
   --lines-dir STRING, -l STRING
                         name of lines output directory (default: lines)
+  --scores-dir STRING, -s STRING
+                        name of scores output directory (default: scores)
 ```
