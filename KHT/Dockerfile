@@ -6,6 +6,7 @@ ENV PYTHONPATH="$PYTHONPATH:/usr/local/lib/kht/python/${PYTHON_VERSION}"
 
 WORKDIR /detector
 
+# install dependencies
 RUN apt-get update  \
     && apt-get install --no-install-recommends -y \
     cmake \
@@ -25,12 +26,14 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# build cpp
 RUN cd cpp \
     && mkdir build \
     && cd build \
     && cmake .. \
     && cmake --build . --config Release --target install
 
+# build python bindings
 RUN cd python  \
     && mkdir build  \
     && cd build \
