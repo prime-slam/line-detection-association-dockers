@@ -113,7 +113,7 @@ int LSWMS::run(const cv::Mat &img, std::vector<LSEG> &lSegs, std::vector<double>
 
 	// Input image to __img
 	if(img.channels() == 3)
-		cv::cvtColor(img, __img, CV_BGR2GRAY);
+		cv::cvtColor(img, __img, cv::COLOR_BGR2GRAY);
 	else
 		__img = img;
 
@@ -1028,10 +1028,10 @@ float LSWMS::grow(const DIR_POINT &dpOrig, cv::Point &ptDst, int dir)
 
 void LSWMS::setPaddingToZero(cv::Mat &img, int NN)
 {
-	cv::rectangle(img, cv::Point(0,0), cv::Point(img.cols-1, NN-1), cv::Scalar(0), CV_FILLED);
-	cv::rectangle(img, cv::Point(0,0), cv::Point(NN-1, img.rows-1), cv::Scalar(0), CV_FILLED);
-	cv::rectangle(img, cv::Point(0,img.rows-NN), cv::Point(img.cols-1, img.rows-1), cv::Scalar(0), CV_FILLED);
-	cv::rectangle(img, cv::Point(img.cols-NN,0), cv::Point(img.cols-1, img.rows-1), cv::Scalar(0), CV_FILLED);
+	cv::rectangle(img, cv::Point(0,0), cv::Point(img.cols-1, NN-1), cv::Scalar(0), cv::FILLED);
+	cv::rectangle(img, cv::Point(0,0), cv::Point(NN-1, img.rows-1), cv::Scalar(0), cv::FILLED);
+	cv::rectangle(img, cv::Point(0,img.rows-NN), cv::Point(img.cols-1, img.rows-1), cv::Scalar(0), cv::FILLED);
+	cv::rectangle(img, cv::Point(img.cols-NN,0), cv::Point(img.cols-1, img.rows-1), cv::Scalar(0), cv::FILLED);
 }
 void LSWMS::drawLSegs(cv::Mat &img, std::vector<LSEG> &lSegs, cv::Scalar color, int thickness)
 {

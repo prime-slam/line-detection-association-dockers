@@ -78,7 +78,7 @@ void help()
 void processPPHT(cv::Mat &img, std::vector<LSEG> &lSegs)
 {
 	cv::Mat imgGRAY;
-	cv::cvtColor(img, imgGRAY, CV_RGB2GRAY);
+	cv::cvtColor(img, imgGRAY, cv::COLOR_RGB2GRAY);
 	cv::Mat dst;
 	cv::Canny(imgGRAY, dst, 20, 80, 3);
 	std::vector<cv::Vec4i> lines;
@@ -215,10 +215,10 @@ int main(int argc, char** argv)
 		else
 		{
 			// Show video information
-			width = (int) video.get(CV_CAP_PROP_FRAME_WIDTH);
-			height = (int) video.get(CV_CAP_PROP_FRAME_HEIGHT);
-			fps = (int) video.get(CV_CAP_PROP_FPS);
-			fourcc = (int) video.get(CV_CAP_PROP_FOURCC);
+			width = (int) video.get(cv::CAP_PROP_FRAME_WIDTH);
+			height = (int) video.get(cv::CAP_PROP_FRAME_HEIGHT);
+			fps = (int) video.get(cv::CAP_PROP_FPS);
+			fourcc = (int) video.get(cv::CAP_PROP_FOURCC);
 
 			if(!useCamera)
 				printf("Input video: (%d x %d) at %d fps, fourcc = %d\n", width, height, fps, fourcc);
@@ -289,7 +289,7 @@ int main(int argc, char** argv)
 		// Color Conversion
 		if(inputImg.channels() == 3)
 		{
-			cv::cvtColor(inputImg, imgGRAY, CV_BGR2GRAY);	
+			cv::cvtColor(inputImg, imgGRAY, cv::COLOR_BGR2GRAY);
 			inputImg.copyTo(outputImg);
 			if(usePPHT)
 				inputImg.copyTo(outputImgPPHT);			
@@ -297,9 +297,9 @@ int main(int argc, char** argv)
 		else
 		{
 			inputImg.copyTo(imgGRAY);
-			cv::cvtColor(inputImg, outputImg, CV_GRAY2BGR);
+			cv::cvtColor(inputImg, outputImg, cv::COLOR_GRAY2BGR);
 			if(usePPHT)
-				cv::cvtColor(inputImg, outputImgPPHT, CV_GRAY2BGR);			
+				cv::cvtColor(inputImg, outputImgPPHT, cv::COLOR_GRAY2BGR);
 		}
 
 		// ++++++++++++++++++++++++++++++++++++++++
