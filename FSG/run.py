@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.0.0)
-project(FSG LANGUAGES CXX)
+from pathlib import Path
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+from adapter import Adapter
+from common.parser import create_base_parser
 
-find_package(OpenCV REQUIRED)
+if __name__ == "__main__":
+    parser = create_base_parser(with_score_directory=False)
 
-file(GLOB_RECURSE LIB_SOURCES "src/*.cpp" "src/*.h")
-add_library(fsg ${LIB_SOURCES} src/main.cpp)
-target_link_libraries(fsg ${OpenCV_LIBS})
-target_include_directories(fsg PUBLIC ${PROJECT_SOURCE_DIR}/src)
-
-add_executable(fsg_main src/main.cpp)
-target_link_libraries(fsg_main fsg ${OpenCV_LIBS})
-
-add_subdirectory(bindings)
+    args = parser.parse_args()
+    Adapter(
+        image_path=Path(args.imgs),
+        output_path=Path(args.output),
+        lines_output_directory=Path(args.lines_dir),
+        scores_output_directory=None,
+    ).run()

@@ -1,40 +1,30 @@
-![Graffter Banner](images/banner.jpg)
-# FSG: A statistical approach to line detection via fast segments grouping
-
-
-This repository contains the source code of [FSG: A statistical approach to line detection via fast segments grouping](http://www.dia.fi.upm.es/~pcr/publications/iros2018.pdf). It allows merging segments extremely fast to fix broken detections and find large lines.
-The method can be used with any line segment detector. We use LSD here, as it was done in the original paper.
-
-<p align="center">
-<img src="images/fsg-iros18.gif" />
-</p>
-
-
-### Compile and run
-
-Instructions tested in Ubuntu 18.04:
-
+# FSG Docker Image
+This folder contains adapters for [FSG](https://github.com/iago-suarez/FSG) and a docker image
+## Building Docker Image
+Build docker image using `Dockerfile`:
 ```
-sudo apt-get install build-essential libopencv-dev
-mkdir build && cd build
-cmake ..
-make -j
-./fsg_main
+docker build -t fsg .
+```
+Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
+## Running Docker Container
+To run the container use the following command:
+```
+docker run --rm \
+-v <IMAGES_PATH>:/detector/input \
+-v <OUTPUT_PATH>:/detector/output \
+-v $(realpath ../common/):/detector/common \
+fsg [OPTIONAL_ARGS]
 ```
 
-If everything goes well you should be able to see the following demo:
+Here `<IMAGES_PATH>` is the path where your image dataset is stored on the host machine and `<OUTPUT_PATH>` is the path where the results will be saved.
 
-![Demo Result](images/demo-result.jpg)
-
-### Cite
-
-```bibtex
-@inproceedings{suarez2018fsg,
-  author={Su{\'a}rez, Iago and Mu{\~n}oz, Enrique and Buenaposada, Jos{\'e} M and Baumela, Luis},
-  booktitle={2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
-  title={FSG: A statistical approach to line detection via fast segments grouping}, 
-  year={2018},
-  pages={97-102},
-  doi={10.1109/IROS.2018.8594434}
-  }
+The following `[OPTIONAL_ARGS]` can be used:
+```
+optional arguments:
+  -h, --help            show this help message and exit
+  --imgs PATH, -i PATH  path to images (default: input/)
+  --output PATH, -o PATH
+                        output path (default: output/)
+  --lines-dir STRING, -l STRING
+                        name of lines output directory (default: lines)
 ```
