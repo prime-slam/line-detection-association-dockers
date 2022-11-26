@@ -43,8 +43,8 @@ py::array_t<float> ComputeFsg(py::array &image, double length_threshold) {
 
     py::array_t<float> py_lines({rows, cols});
 
-    for (auto i = 0; i < rows; i++) {
-        for (auto j = 0; j < cols; ++j) {
+    for (auto i = 0; i != rows; ++i) {
+        for (auto j = 0; j != cols; ++j) {
             py_lines.mutable_at(i, j) = filtered_lines[i][j];
         }
     }
