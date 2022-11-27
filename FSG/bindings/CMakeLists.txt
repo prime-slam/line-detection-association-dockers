@@ -13,19 +13,9 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.0.0)
-project(FSG LANGUAGES CXX)
+project(pyelsed LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(pybind11 REQUIRED)
 
-find_package(OpenCV REQUIRED)
-
-file(GLOB_RECURSE LIB_SOURCES "src/*.cpp" "src/*.h")
-add_library(fsg ${LIB_SOURCES} src/main.cpp)
-target_link_libraries(fsg ${OpenCV_LIBS})
-target_include_directories(fsg PUBLIC ${PROJECT_SOURCE_DIR}/src)
-
-add_executable(fsg_main src/main.cpp)
-target_link_libraries(fsg_main fsg ${OpenCV_LIBS})
-
-add_subdirectory(bindings)
+pybind11_add_module(pyfsg pyfsg.cpp)
+target_link_libraries(pyfsg PUBLIC fsg)
