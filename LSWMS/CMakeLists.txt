@@ -1,27 +1,18 @@
-##############################
-PROJECT( lineSegment )
-##############################
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 3.0.0)
+project(lswms LANGUAGES CXX)
 
-# Packages
-find_package( OpenCV REQUIRED )
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+find_package(OpenCV REQUIRED)
 
-# Includes
-include_directories(	
-	${OPENCV_INCLUDE_DIR}
-	${PROJECT_BINARY_DIR}
-)
+add_library(lswms src/LSWMS.cpp src/LSWMS.h)
+target_link_libraries(lswms ${OpenCV_LIBS})
+target_include_directories(lswms PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
-set(SOURCE_FILES 
-	main.cpp
-	LSWMS.cpp
-	LSWMS.h
-)
+add_executable(lswms_demo main.cpp)
+target_link_libraries(lswms_demo lswms ${OpenCV_LIBS})
 
-
-# Add executable and target link libraries
-ADD_EXECUTABLE( lineSegment ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES( lineSegment ${OpenCV_LIBS})
+add_subdirectory(bindings)
 
 
