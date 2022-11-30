@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
 
 ARG MODEL_PATH=https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.zip
+
+ARG NVIDIA_REPO_KEY=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
 
 WORKDIR /detector
 
 # install dependencies
-RUN apt-get update  \
+RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
+    && apt-get update \
     && apt-get install --no-install-recommends -y \
     libgl1 \
     libglib2.0-0 \

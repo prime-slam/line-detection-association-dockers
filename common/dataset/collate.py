@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from torch.utils.data import default_collate
+from torch.utils.data.dataloader import default_collate
 
 
 def collate(batch):

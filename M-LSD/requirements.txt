@@ -1,6 +1,7 @@
+Flask
 gradio
 numpy
 opencv-python
 pillow
-Flask
 scikit-image
+tqdm

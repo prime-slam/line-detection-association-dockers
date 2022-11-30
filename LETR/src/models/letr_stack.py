@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 from PIL import Image
-from LETR.src.util.misc import NestedTensor, nested_tensor_from_tensor_list
+from src.util.misc import NestedTensor, nested_tensor_from_tensor_list
 import copy
 
 
