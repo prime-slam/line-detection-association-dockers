@@ -1,4 +1,6 @@
 # Cannylines Docker Image
+**NOTE**. This algorithm is unstable. This may cause a failure when calculating the results.
+
 This folder contains adapters for [Cannylines](https://github.com/ludlows/CannyLine) and a docker image
 ## Building Docker Image
 Build docker image using `Dockerfile`:
