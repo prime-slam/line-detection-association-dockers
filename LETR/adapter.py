@@ -21,13 +21,13 @@ from torch.nn.functional import softmax
 from typing import List, Any
 
 from common.adapter.torch_adapter import TorchAdapter
+from common.dataset.collate import collate
 from common.device import Device
 from common.image_metadata import ImageMetadata
-from common.dataset.collate import collate
 from common.dataset.line_dataset import LineDataset
 from common.prediction import Prediction
-from LETR.src.models import build_model
-from LETR.src.util.misc import nested_tensor_from_tensor_list
+from src.models import build_model
+from src.util.misc import nested_tensor_from_tensor_list
 
 
 class Adapter(TorchAdapter):

@@ -1,1 +1,3 @@
+scikit-image
 scipy
+tqdm

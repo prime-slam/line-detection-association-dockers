@@ -100,6 +100,7 @@ class Adapter(TorchAdapter):
         lines, scores = predictions[:, :-1], predictions[:, -1]
         line_lengths = np.sqrt(((lines[:, :2] - lines[:, 2:]) ** 2).sum(-1))
         scores = np.reciprocal(scores / line_lengths)
+        scores /= scores.max()
 
         output_height, output_width = self.model_output_size
 
