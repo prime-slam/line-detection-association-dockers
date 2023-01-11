@@ -40,20 +40,16 @@ class AdapterBase(ABC):
 
     def _save_prediction(self, prediction: Prediction) -> None:
         self.lines_path.mkdir(parents=True, exist_ok=True)
-        file_name = prediction.metadata.image_name
+        file_name = prediction.metadata.image_name + self.prediction_file_suffix
         np.savetxt(
-            self.lines_path.joinpath(file_name).with_suffix(
-                self.prediction_file_suffix
-            ),
+            self.lines_path / file_name,
             prediction.lines,
             delimiter=",",
         )
         if self.scores_path:
             self.scores_path.mkdir(parents=True, exist_ok=True)
             np.savetxt(
-                self.scores_path.joinpath(file_name).with_suffix(
-                    self.prediction_file_suffix
-                ),
+                self.scores_path / file_name,
                 prediction.scores,
                 delimiter=",",
             )
