@@ -1,0 +1,11 @@
+# tensorflow 1.15.4 requires numpy < 1.19.0, >= 1.16.0
+# tested numpy version 1.18.5
+# tested tensorpack version 0.10.1
+numpy < 1.19.0, >= 1.16.0
+tensorflow == 1.15.4
+tensorpack == 0.10.1
+
+# original packages
+opencv-contrib-python == 4.0.1.24
+pandas == 1.0.5
+matplotlib == 3.1.1
