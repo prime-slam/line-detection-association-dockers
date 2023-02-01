@@ -19,7 +19,7 @@ docker run --rm --gpus=all \
 linetr [OPTIONAL_ARGS]
 ```
 
-Here `<IMAGES_PATH>` is the path where your image dataset is stored on the host machine. `<LINES_PATH> is the path where your predicted lines are stored on the host machine as CSV files (each line must be stored in the following format: `x1,y1,x2,y2`).`<OUTPUT_PATH>` is the path where the results will be saved.
+Here `<IMAGES_PATH>` is the path where your image dataset is stored on the host machine. `<LINES_PATH>` is the path where your predicted lines are stored on the host machine as CSV files (each line must be stored in the following format: `x1,y1,x2,y2`).`<OUTPUT_PATH>` is the path where the results will be saved.
 
 The following `[OPTIONAL_ARGS]` can be used:
 ```
