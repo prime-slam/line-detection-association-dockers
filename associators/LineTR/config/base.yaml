@@ -1,0 +1,17 @@
+auto_min_length: False
+
+superpoint:
+  nms_radius: 4
+  keypoint_threshold: 0.005
+  max_keypoints: 1024
+  nn_threshold: 0.7
+
+linetransformer:
+  max_keylines: -1
+  min_length: 16
+  token_distance: 8
+  nn_threshold: 0.8
+
+resize:
+  width: 640
+  height: 480
