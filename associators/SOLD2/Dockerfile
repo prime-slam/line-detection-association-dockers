@@ -12,16 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
-from dataclasses import dataclass
-from typing import Optional, Tuple
+WORKDIR /associator
 
-from common.image_metadata import ImageMetadata
+# install dependencies
+RUN apt-get update  \
+    && apt-get install --no-install-recommends -y \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
+# install python requirements
+COPY requirements.txt requirements.txt
 
-@dataclass
-class Prediction:
-    associations: np.ndarray
-    pair_metadata: Tuple[ImageMetadata, ImageMetadata]
-    scores: Optional[np.ndarray] = None
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN python3 download_model.py
+
+ENTRYPOINT ["python3", "run.py"]

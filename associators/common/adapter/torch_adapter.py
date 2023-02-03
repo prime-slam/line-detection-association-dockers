@@ -31,16 +31,16 @@ class TorchAdapter(AdapterBase, ABC):
         images_path: Path,
         lines_path: Path,
         associations_dir: str,
-        association_scores_dir: Optional[str],
         output_path: Path,
         device: Device,
+        association_scores_dir: Optional[str] = None,
     ):
         super().__init__(
             images_path,
             lines_path,
             associations_dir,
-            association_scores_dir,
             output_path,
+            association_scores_dir,
         )
 
         device_name = "cpu"
