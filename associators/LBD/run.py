@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+from pathlib import Path
 
-from dataclasses import dataclass
-from typing import Optional, Tuple
+from adapter import Adapter
+from common.parser import create_base_parser
 
-from common.image_metadata import ImageMetadata
+if __name__ == "__main__":
+    parser = create_base_parser(with_score_directory=False)
+    args = parser.parse_args()
 
-
-@dataclass
-class Prediction:
-    associations: np.ndarray
-    pair_metadata: Tuple[ImageMetadata, ImageMetadata]
-    scores: Optional[np.ndarray] = None
+    Adapter(
+        images_path=Path(args.imgs),
+        lines_path=Path(args.lines),
+        associations_dir=args.associations_dir,
+        output_path=Path(args.output),
+        frames_step=args.step,
+        pairs_file=args.pairs,
+    ).run()

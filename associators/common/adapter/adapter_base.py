@@ -16,9 +16,10 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Optional, Tuple
 
 from common.frames_pair import FramesPair
+from common.image_metadata import ImageMetadata
 from common.prediction import Prediction
 
 
@@ -36,7 +37,9 @@ class AdapterBase(ABC):
         self.images_path = images_path
         self.lines_path = lines_path
         self.associations_output_path = output_path / associations_dir
-        self.association_scores_output_path = output_path / association_scores_dir
+        self.association_scores_output_path = (
+            output_path / association_scores_dir if association_scores_dir else None
+        )
         self.output_path = output_path
         self.prediction_file_suffix = ".csv"
 
@@ -82,6 +85,6 @@ class AdapterBase(ABC):
 
     @abstractmethod
     def _postprocess_prediction(
-        self, raw_predictions: Any, metadata: Dict
+        self, raw_predictions: Any, metadata: Tuple[ImageMetadata, ImageMetadata]
     ) -> Prediction:
         pass

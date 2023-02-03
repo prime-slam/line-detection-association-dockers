@@ -12,16 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+FROM python:3.9-slim
 
-from dataclasses import dataclass
-from typing import Optional, Tuple
+ENV PROJECT_DIR=/associator
 
-from common.image_metadata import ImageMetadata
+WORKDIR $PROJECT_DIR
 
+# install dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    cmake \
+    gcc\
+    g++ \
+    libgl1 \
+    libglib2.0-0 \
+    make \
+    libopencv-dev \
+    libopencv-contrib-dev \
+    libarpack++2-dev \
+    libarpack2-dev \
+    libsuperlu-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-@dataclass
-class Prediction:
-    associations: np.ndarray
-    pair_metadata: Tuple[ImageMetadata, ImageMetadata]
-    scores: Optional[np.ndarray] = None
+# install python requirements
+COPY requirements.txt requirements.txt
+
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
+# install pytlbd
+COPY . .
+
+RUN python3 -m pip install .
+
+ENTRYPOINT ["python3", "run.py"]
