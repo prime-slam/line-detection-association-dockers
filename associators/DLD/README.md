@@ -1,5 +1,5 @@
 # DLD Docker Image
-This folder contains adapter for [LineTR](https://github.com/yosungho/LineTR) and a docker image
+This folder contains adapter for [DLD](https://github.com/manuellange/DLD) and a docker image
 ## Building Docker Image
 1) Install the appropriate NVIDIA drivers with at least `cuda` version 11.3 on your host machine. You can check your cuda version with `nvidia-smi` command.
 2) Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) on your host machine.

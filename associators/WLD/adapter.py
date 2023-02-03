@@ -63,12 +63,12 @@ class Adapter(TensorflowAdapter):
 
     def _create_frame_pairs_loader(self):
         return FramePairsDataset(
-                self.images_path,
-                self.lines_path,
-                transform_frames_pair=self._transform_frames_pair,
-                frames_step=self.frames_step,
-                pairs_file=self.pairs_file,
-            )
+            self.images_path,
+            self.lines_path,
+            transform_frames_pair=self._transform_frames_pair,
+            frames_step=self.frames_step,
+            pairs_file=self.pairs_file,
+        )
 
     def _transform_frames_pair(self, pair: FramesPair):
         return pair
@@ -90,16 +90,22 @@ class Adapter(TensorflowAdapter):
         first_lines, second_lines = frames_pair.lines_pair
 
         first_descriptors = self.__create_descriptors(model, first_lines, first_image)
-        second_descriptors = self.__create_descriptors(model, second_lines, second_image)
+        second_descriptors = self.__create_descriptors(
+            model, second_lines, second_image
+        )
 
         return match_descriptors(first_descriptors, second_descriptors)
 
     def __create_descriptors(self, model, lines, image):
-        (batch_cutouts, batch_wavelets, batch_heights) = self.__create_frame_data(lines, image)
+        (batch_cutouts, batch_wavelets, batch_heights) = self.__create_frame_data(
+            lines, image
+        )
         descriptors, _ = model(batch_cutouts, batch_heights, batch_wavelets)
         return descriptors
 
-    def __create_frame_data(self, lines, image, cutout_width: int = 27, cutout_height: int = 100):
+    def __create_frame_data(
+        self, lines, image, cutout_width: int = 27, cutout_height: int = 100
+    ):
         keylines = []
         img_max_size = max(image.shape)
         processor = LineProcessor()
