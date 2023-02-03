@@ -12,16 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+FROM tensorflow/tensorflow:2.5.0-gpu
 
-from dataclasses import dataclass
-from typing import Optional, Tuple
+ARG NVIDIA_REPO_KEY=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
 
-from common.image_metadata import ImageMetadata
+WORKDIR /associator
 
+# install dependencies
+RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
+    && apt-get update  \
+    && apt-get install --no-install-recommends -y \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-@dataclass
-class Prediction:
-    associations: np.ndarray
-    pair_metadata: Tuple[ImageMetadata, ImageMetadata]
-    scores: Optional[np.ndarray] = None
+# install python requirements
+COPY requirements.txt requirements.txt
+
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENTRYPOINT ["python3", "run.py"]
