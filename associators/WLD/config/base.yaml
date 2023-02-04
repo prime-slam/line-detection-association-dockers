@@ -1,0 +1,9 @@
+use_dense_net: False
+log_devices: False
+c_width: 27
+c_height: 100
+depth: 10
+fixed_length: False
+prob: 0.
+brightness_d: 1.5
+disable_bn: True

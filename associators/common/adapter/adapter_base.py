@@ -31,14 +31,16 @@ class AdapterBase(ABC):
         images_path: Path,
         lines_path: Path,
         associations_dir: str,
-        association_scores_dir: Optional[str],
         output_path: Path,
+        association_scores_dir: Optional[str] = None,
     ):
         self.images_path = images_path
         self.lines_path = lines_path
         self.associations_output_path = output_path / associations_dir
         self.association_scores_output_path = (
-            output_path / association_scores_dir if association_scores_dir else None
+            output_path / association_scores_dir
+            if association_scores_dir is not None
+            else None
         )
         self.output_path = output_path
         self.prediction_file_suffix = ".csv"
