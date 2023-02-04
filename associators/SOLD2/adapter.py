@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import cv2
+import kornia as K
+import kornia.feature as KF
 import numpy as np
 import torch
 
-import kornia as K
-import kornia.feature as KF
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any, Tuple
 from torch.utils.data.dataloader import default_collate
 
 from common.adapter.torch_adapter import TorchAdapter
