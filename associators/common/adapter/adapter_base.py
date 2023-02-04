@@ -16,9 +16,10 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Optional, Tuple
 
 from common.frames_pair import FramesPair
+from common.image_metadata import ImageMetadata
 from common.prediction import Prediction
 
 
@@ -86,6 +87,6 @@ class AdapterBase(ABC):
 
     @abstractmethod
     def _postprocess_prediction(
-        self, raw_predictions: Any, metadata: Dict
+        self, raw_predictions: Any, metadata: Tuple[ImageMetadata, ImageMetadata]
     ) -> Prediction:
         pass
