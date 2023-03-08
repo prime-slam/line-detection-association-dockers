@@ -72,5 +72,5 @@ RUN wget -O opencv-${opencv_ver}.zip https://github.com/opencv/opencv/archive/${
 # python
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 # RUN python -m pip --upgrade pip --no-cache-dir
-COPY requirements.txt .
+COPY ../requirements.txt .
 RUN pip3 install -r requirements.txt --no-cache-dir

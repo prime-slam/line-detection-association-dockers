@@ -1,4 +1,12 @@
-numpy
-opencv-python
-scikit-image
-tqdm
+imageio==2.22.4
+networkx==2.8.8
+numpy==1.23.5
+opencv-python==4.6.0.66
+packaging==21.3
+Pillow==9.3.0
+pyparsing==3.0.9
+PyWavelets==1.4.1
+scikit-image==0.19.3
+scipy==1.9.3
+tifffile==2022.10.10
+tqdm==4.64.1

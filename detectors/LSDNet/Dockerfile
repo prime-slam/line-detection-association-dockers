@@ -71,14 +71,15 @@ RUN wget -O opencv-${OPENCV_VERSION}.zip https://github.com/opencv/opencv/archiv
 
 WORKDIR /detector
 
-COPY devops/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 
 RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
 COPY . .
 
 # Build cpp project
-RUN cd line_extracter/cmake-build-release \
+RUN mkdir line_extracter/cmake-build-release \
+    && cd line_extracter/cmake-build-release \
     && cmake .. -DCMAKE_BUILD_TYPE=Release \
     && make -j4
 
