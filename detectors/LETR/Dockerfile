@@ -44,4 +44,6 @@ RUN mkdir pretrained \
 
 COPY . .
 
+RUN python3 download_model.py
+
 ENTRYPOINT ["python3", "run.py"]
