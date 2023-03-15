@@ -25,11 +25,13 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./M-LSD/requirements.txt requirements.txt
 
 RUN python3 -m pip install --upgrade pip \
     && python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./M-LSD .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

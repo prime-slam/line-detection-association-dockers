@@ -26,7 +26,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./ULSD/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
@@ -36,6 +36,8 @@ RUN mkdir pretrained \
     && gdown "1h3MRMw6shf1OIylgWkNi57txTsI3SzPm" -O $WORK_DIR/pretrained/fisheye.pkl \
     && gdown "1Uq13MBxEknnxHw0R9uLcDvZ75peEC1eT" -O $WORK_DIR/pretrained/spherical.pkl
 
-COPY . .
+COPY ./ULSD .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

@@ -3,7 +3,7 @@ This folder contains adapter for [LBD](https://github.com/iago-suarez/pytlbd) an
 ## Building Docker Image
 Build docker image using `Dockerfile`:
 ```
-docker build -t lbd .
+docker build -t lbd -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -13,7 +13,6 @@ docker run --rm \
 -v <IMAGES_PATH>:/associator/input \
 -v <LINES_PATH>:/associator/lines \
 -v <OUTPUT_PATH>:/associator/output \
--v $(realpath ../common/):/associator/common \
 lbd [OPTIONAL_ARGS]
 ```
 

@@ -25,7 +25,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./F-Clip/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
@@ -36,6 +36,8 @@ RUN gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
     && rm -rf __MACOSX \
     && mv ckpt pretrained
 
-COPY . .
+COPY ./F-Clip .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

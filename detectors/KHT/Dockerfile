@@ -20,11 +20,13 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./KHT/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./KHT .
+
+COPY ./common ./common
 
 # build cpp
 RUN cd cpp \

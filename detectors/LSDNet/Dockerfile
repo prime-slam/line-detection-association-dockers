@@ -71,11 +71,13 @@ RUN wget -O opencv-${OPENCV_VERSION}.zip https://github.com/opencv/opencv/archiv
 
 WORKDIR /detector
 
-COPY requirements.txt requirements.txt
+COPY ./LSDNet/requirements.txt requirements.txt
 
 RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
-COPY . .
+COPY ./LSDNet .
+
+COPY ./common ./common
 
 # Build cpp project
 RUN mkdir line_extracter/cmake-build-release \

@@ -35,12 +35,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./LBD/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # install pytlbd
-COPY . .
+COPY ./LBD .
+
+COPY ./common ./common
 
 RUN python3 -m pip install .
 

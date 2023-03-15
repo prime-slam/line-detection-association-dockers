@@ -27,7 +27,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./HT-LCNN/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
@@ -35,6 +35,8 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 RUN mkdir pretrained \
     && wget $MODEL_PATH -O pretrained/checkpoint.pth.tar
 
-COPY . .
+COPY ./HT-LCNN .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

@@ -21,10 +21,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libglib2.0-0
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./TP-LSD/requirements.txt requirements.txt
+
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./TP-LSD .
+
+COPY ./common ./common
 
 RUN cd modeling/DCNv2 && python3 setup.py build develop
 

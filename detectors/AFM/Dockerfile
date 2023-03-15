@@ -32,11 +32,13 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./AFM/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
-COPY . .
+COPY ./AFM .
+
+COPY ./common ./common
 
 # download pretrained models
 RUN gdown $MODEL_GDRIVE_ID -O checkpoint.zip \

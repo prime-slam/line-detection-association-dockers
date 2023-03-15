@@ -5,7 +5,7 @@ This folder contains adapter for [WLD](https://github.com/manuellange/WLD) and a
 2) Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) on your host machine.
 3) Build docker image using `Dockerfile`:
 ```
-docker build -t wdl .
+docker build -t wld -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -15,7 +15,6 @@ docker run --rm --gpus=all \
 -v <IMAGES_PATH>:/associator/input \
 -v <LINES_PATH>:/associator/lines \
 -v <OUTPUT_PATH>:/associator/output \
--v $(realpath ../common/):/associator/common \
 wld [OPTIONAL_ARGS]
 ```
 

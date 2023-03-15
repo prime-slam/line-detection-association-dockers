@@ -9,10 +9,12 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./EDLines/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./EDLines .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

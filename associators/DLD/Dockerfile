@@ -28,10 +28,12 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./DLD/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./DLD .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

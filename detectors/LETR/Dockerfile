@@ -31,7 +31,7 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./LETR/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
@@ -42,7 +42,9 @@ RUN mkdir pretrained \
     && mv exp/res101_stage2_focal/checkpoints/checkpoint0024.pth pretrained/checkpoint.pth \
     && rm -rf exp checkpoint.zip
 
-COPY . .
+COPY ./LETR .
+
+COPY ./common ./common
 
 RUN python3 download_model.py
 

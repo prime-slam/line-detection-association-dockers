@@ -29,15 +29,17 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./HAWP/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # download pretrained models
-COPY downloads.sh download_models.sh
+COPY ./HAWP/downloads.sh download_models.sh
 
 RUN bash ./download_models.sh
 
-COPY . .
+COPY ./HAWP .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

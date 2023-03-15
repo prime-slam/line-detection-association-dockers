@@ -24,7 +24,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY ./L-CNN/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
@@ -32,6 +32,8 @@ RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 RUN mkdir pretrained \
     && gdown "1NvZkEqWNUBAfuhFPNGiCItjy4iU0UOy2" -O pretrained/checkpoint.tar
 
-COPY . .
+COPY ./L-CNN .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

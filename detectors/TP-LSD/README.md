@@ -6,7 +6,7 @@ This folder contains adapters for [TP-LSD](https://github.com/Siyuada7/TP-LSD/) 
 3) Change default docker runtime to nvidia. See `Default runtime` [here](https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime).
 4) Build docker image using `Dockerfile`:
 ```
-docker build -t tp-lsd .
+docker build -t tp-lsd -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -15,7 +15,6 @@ To run the container use the following command:
 docker run --rm --gpus=all \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
--v $(realpath ../common/):/detector/common \
 tp-lsd [OPTIONAL_ARGS]
 ```
 

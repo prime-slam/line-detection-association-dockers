@@ -3,7 +3,7 @@ This folder contains adapters for [FLD](https://docs.opencv.org/4.x/df/ded/group
 ## Building Docker Image
 Build docker image using `Dockerfile`:
 ```
-docker build -t fld .
+docker build -t fld -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -12,7 +12,6 @@ To run the container use the following command:
 docker run --rm \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
--v $(realpath ../common/):/detector/common \
 fld [OPTIONAL_ARGS]
 ```
 
