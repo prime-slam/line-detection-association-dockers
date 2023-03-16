@@ -18,6 +18,8 @@ ENV PROJECT_DIR=/detector
 
 ENV PYTHONPATH="$PYTHONPATH:$PROJECT_DIR/build/bindings"
 
+ARG ALGORITHM_FOLDER=ELSED
+
 WORKDIR $PROJECT_DIR
 
 # install dependencies
@@ -33,11 +35,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./ELSED/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir "pybind11[global]" -r requirements.txt
 
-COPY ./ELSED .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

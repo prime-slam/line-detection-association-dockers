@@ -14,6 +14,8 @@
 
 FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
+ARG ALGORITHM_FOLDER=F-Clip
+
 WORKDIR /detector
 
 # install dependencies
@@ -25,7 +27,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./F-Clip/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
@@ -36,7 +38,7 @@ RUN gdown "1jMZB-kYTNAGaVPW0FBLTAQMc3m3vR-_P" \
     && rm -rf __MACOSX \
     && mv ckpt pretrained
 
-COPY ./F-Clip .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

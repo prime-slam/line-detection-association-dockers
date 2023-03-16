@@ -13,6 +13,9 @@
 # limitations under the License.
 
 FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
+
+ARG ALGORITHM_FOLDER=TP-LSD
+
 WORKDIR /detector
 
 # install dependencies
@@ -21,11 +24,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libglib2.0-0
 
 # install python requirements
-COPY ./TP-LSD/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY ./TP-LSD .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

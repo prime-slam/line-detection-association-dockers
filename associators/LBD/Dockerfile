@@ -14,6 +14,8 @@
 
 FROM python:3.9-slim
 
+ARG ALGORITHM_FOLDER=LBD
+
 ENV PROJECT_DIR=/associator
 
 WORKDIR $PROJECT_DIR
@@ -35,12 +37,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./LBD/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # install pytlbd
-COPY ./LBD .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

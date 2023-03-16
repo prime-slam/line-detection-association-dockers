@@ -16,6 +16,8 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
 WORKDIR /detector
 
+ARG ALGORITHM_FOLDER=HT-LCNN
+
 ARG MODEL_PATH=https://surfdrive.surf.nl/files/index.php/s/hpi721UAIr43avr/download?path=%2Fht_lcnn&files=checkpoint.pth.tar
 
 # install dependencies
@@ -27,7 +29,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./HT-LCNN/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
@@ -35,7 +37,7 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 RUN mkdir pretrained \
     && wget $MODEL_PATH -O pretrained/checkpoint.pth.tar
 
-COPY ./HT-LCNN .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

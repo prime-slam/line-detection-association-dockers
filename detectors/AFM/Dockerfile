@@ -16,6 +16,8 @@ FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
 
 ENV WORK_DIR=/detector
 
+ARG ALGORITHM_FOLDER=AFM
+
 ARG NVIDIA_REPO_KEY=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
 
 ARG MODEL_GDRIVE_ID="1AnLWs91vQdsJm6jJhB7MAvbIIQc0hJL2"
@@ -32,11 +34,11 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./AFM/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
-COPY ./AFM .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

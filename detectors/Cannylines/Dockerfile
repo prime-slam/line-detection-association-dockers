@@ -2,6 +2,8 @@ FROM python:3.9-slim
 
 ARG CANNYLINES_PATH=https://github.com/ludlows/CannyLine/archive/refs/heads/master.zip
 
+ARG ALGORITHM_FOLDER=Cannylines
+
 WORKDIR /detector
 
 RUN apt-get update  \
@@ -11,11 +13,11 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./Cannylines/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir $CANNYLINES_PATH -r requirements.txt
 
-COPY ./Cannylines .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 

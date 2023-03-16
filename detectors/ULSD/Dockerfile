@@ -16,6 +16,8 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
 ENV WORK_DIR="/detector"
 
+ARG ALGORITHM_FOLDER=ULSD
+
 WORKDIR $WORK_DIR
 
 # install dependencies
@@ -26,7 +28,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY ./ULSD/requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir gdown -r requirements.txt
 
@@ -36,7 +38,7 @@ RUN mkdir pretrained \
     && gdown "1h3MRMw6shf1OIylgWkNi57txTsI3SzPm" -O $WORK_DIR/pretrained/fisheye.pkl \
     && gdown "1Uq13MBxEknnxHw0R9uLcDvZ75peEC1eT" -O $WORK_DIR/pretrained/spherical.pkl
 
-COPY ./ULSD .
+COPY $ALGORITHM_FOLDER .
 
 COPY ./common ./common
 
