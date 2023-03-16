@@ -5,7 +5,7 @@ This folder contains adapters for [AFM](https://github.com/cherubicXN/afm_cvpr20
 2) Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) on your host machine.
 3) Build docker image using `Dockerfile`:
 ```
-docker build -t afm .
+docker build -t afm -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -14,7 +14,6 @@ To run the container use the following command:
 docker run --rm --gpus=all \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
--v $(realpath ../common/):/detector/common \
 afm [OPTIONAL_ARGS]
 ```
 

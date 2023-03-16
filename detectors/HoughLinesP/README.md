@@ -3,7 +3,7 @@ This folder contains adapters for [HoughLinesP](https://docs.opencv.org/3.4/dd/d
 ## Building Docker Image
 Build docker image using `Dockerfile`:
 ```
-docker build -t houghlinesp .
+docker build -t houghlinesp -f Dockerfile ..
 ```
 Optionally, you can add your user to the docker group as described [here](https://docs.docker.com/engine/install/linux-postinstall/) so that running docker does not require root rights.
 ## Running Docker Container
@@ -12,7 +12,6 @@ To run the container use the following command:
 docker run --rm \
 -v <IMAGES_PATH>:/detector/input \
 -v <OUTPUT_PATH>:/detector/output \
--v $(realpath ../common/):/detector/common \
 houghlinesp [OPTIONAL_ARGS]
 ```
 

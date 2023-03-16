@@ -50,9 +50,9 @@ class Adapter(TorchAdapter):
             images_path,
             lines_path,
             associations_dir,
-            association_scores_dir,
             output_path,
             device,
+            association_scores_dir,
         )
 
         with open(config_path, "r") as conf:

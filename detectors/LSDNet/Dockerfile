@@ -4,6 +4,8 @@ ARG OPENCV_VERSION=4.5.2
 
 ARG CMAKE_VERSION=3.19.7
 
+ARG ALGORITHM_FOLDER=LSDNet
+
 # install dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -y \
     build-essential \
@@ -71,11 +73,13 @@ RUN wget -O opencv-${OPENCV_VERSION}.zip https://github.com/opencv/opencv/archiv
 
 WORKDIR /detector
 
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 # Build cpp project
 RUN mkdir line_extracter/cmake-build-release \

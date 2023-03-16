@@ -14,6 +14,8 @@
 
 FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
+ARG ALGORITHM_FOLDER=SOLD2
+
 WORKDIR /associator
 
 # install dependencies
@@ -24,11 +26,13 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 RUN python3 download_model.py
 

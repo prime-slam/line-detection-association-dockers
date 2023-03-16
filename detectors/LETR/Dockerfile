@@ -18,6 +18,8 @@ ARG MODEL_PATH=https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.
 
 ARG NVIDIA_REPO_KEY=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
 
+ARG ALGORITHM_FOLDER=LETR
+
 WORKDIR /detector
 
 # install dependencies
@@ -31,7 +33,7 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
@@ -42,7 +44,9 @@ RUN mkdir pretrained \
     && mv exp/res101_stage2_focal/checkpoints/checkpoint0024.pth pretrained/checkpoint.pth \
     && rm -rf exp checkpoint.zip
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 RUN python3 download_model.py
 

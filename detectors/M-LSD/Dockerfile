@@ -14,6 +14,8 @@
 
 FROM tensorflow/tensorflow:2.11.0-gpu
 
+ARG ALGORITHM_FOLDER=M-LSD
+
 WORKDIR /detector
 
 # install dependencies
@@ -25,11 +27,13 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --upgrade pip \
     && python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

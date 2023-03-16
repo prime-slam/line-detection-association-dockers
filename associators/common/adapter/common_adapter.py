@@ -33,8 +33,8 @@ class CommonAdapter(AdapterBase, ABC):
             images_path,
             lines_path,
             associations_dir,
-            association_scores_dir,
             output_path,
+            association_scores_dir
         )
 
     def run(self) -> None:

@@ -14,6 +14,8 @@
 
 FROM tensorflow/tensorflow:2.5.0-gpu
 
+ARG ALGORITHM_FOLDER=DLD
+
 ARG NVIDIA_REPO_KEY=https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
 
 WORKDIR /associator
@@ -28,10 +30,12 @@ RUN apt-key adv --fetch-keys $NVIDIA_REPO_KEY \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]

@@ -14,6 +14,8 @@
 
 FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
 
+ARG ALGORITHM_FOLDER=HAWP
+
 WORKDIR /detector
 
 # install dependencies
@@ -29,15 +31,17 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-COPY requirements.txt requirements.txt
+COPY $ALGORITHM_FOLDER/requirements.txt requirements.txt
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # download pretrained models
-COPY downloads.sh download_models.sh
+COPY $ALGORITHM_FOLDER/downloads.sh download_models.sh
 
 RUN bash ./download_models.sh
 
-COPY . .
+COPY $ALGORITHM_FOLDER .
+
+COPY ./common ./common
 
 ENTRYPOINT ["python3", "run.py"]
