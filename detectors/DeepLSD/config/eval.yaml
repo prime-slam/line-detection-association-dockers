@@ -1,0 +1,11 @@
+sharpen: True  # Use the DF normalization (should be True)
+detect_lines: True  # Whether to detect lines or only DF/AF
+
+line_detection_params:
+  merge: False  # Whether to merge close-by lines
+  optimize: False  # Whether to refine the lines after detecting them
+  use_vps: True  # Whether to use vanishing points (VPs) in the refinement
+  optimize_vps: True  # Whether to also refine the VPs in the refinement
+  filtering: True  # Whether to filter out lines based on the DF/AF. Use 'strict' to get an even stricter filtering
+  grad_thresh: 3
+  grad_nfa: True  # If True, use the image gradient and the NFA score of LSD to further threshold lines. We recommand using it for easy images, but to turn it off for challenging images (e.g. night, foggy, blurry images)
