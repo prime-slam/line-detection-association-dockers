@@ -65,7 +65,7 @@ RUN wget http://ceres-solver.org/ceres-solver-${CERES_VERSION}.tar.gz \
     && make install -j4 \
     && rm -rf ceres-solver-${CERES_VERSION}.tar.gz ceres-solver-${CERES_VERSION}
 
-# download model wights
+# download model weights
 RUN mkdir weights \
     && wget $WIREFRAME_WEIGHTS -O weights/deeplsd_wireframe.tar \
     && wget $MEGA_DEPTH_WIGHTS -O weights/deeplsd_md.tar
