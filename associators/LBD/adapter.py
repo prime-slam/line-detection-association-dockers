@@ -68,8 +68,15 @@ class Adapter(CommonAdapter):
         )
 
     def _transform_frames_pair(self, pair: FramesPair):
-        return pair.transform(
-            lambda image: cv2.cvtColor(image, cv2.COLOR_RGB2GRAY), lambda lines: lines
+        return FramesPair(
+            images_pair=tuple(
+                map(
+                    lambda image: cv2.cvtColor(image, cv2.COLOR_RGB2GRAY),
+                    pair.images_pair,
+                )
+            ),
+            images_metadata_pair=pair.images_metadata_pair,
+            lines_pair=pair.lines_pair,
         )
 
     def _build_model(self):

@@ -33,7 +33,7 @@ class FramePairsDataset:
     ):
         self.image_files = sorted(images_path.iterdir())
         self.lines_files = sorted(lines_path.iterdir())
-        self.size = len(self.image_files)
+        images_number = len(self.image_files)
 
         if len(self.image_files) != len(self.lines_files):
             raise ValueError(
@@ -42,8 +42,9 @@ class FramePairsDataset:
         self.pairs = (
             np.genfromtxt(pairs_file)
             if pairs_file
-            else list(zip(range(self.size), range(frames_step, self.size)))
+            else list(zip(range(images_number), range(frames_step, images_number)))
         )
+        self.size = len(self.pairs)
         self.transform_frames_pair = transform_frames_pair
         self.__csv_delimiter = ","
 
@@ -65,23 +66,21 @@ class FramePairsDataset:
         second_lines = np.genfromtxt(second_lines_file, delimiter=self.__csv_delimiter)
 
         first_image_metadata = ImageMetadata(
-            width=first_image.shape[0],
-            height=first_image.shape[1],
+            width=first_image.shape[1],
+            height=first_image.shape[0],
             image_name=first_image_file.stem,
         )
 
         second_image_metadata = ImageMetadata(
-            width=second_image.shape[0],
-            height=second_image.shape[1],
+            width=second_image.shape[1],
+            height=second_image.shape[0],
             image_name=second_image_file.stem,
         )
 
         frame_pair = FramesPair(
             images_pair=(first_image, second_image),
+            images_metadata_pair=(first_image_metadata, second_image_metadata),
             lines_pair=(first_lines, second_lines),
         )
 
-        return self.transform_frames_pair(frame_pair), (
-            first_image_metadata,
-            second_image_metadata,
-        )
+        return self.transform_frames_pair(frame_pair)

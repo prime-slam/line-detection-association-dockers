@@ -79,7 +79,11 @@ class Adapter(TorchAdapter):
         )
 
     def _transform_frames_pair(self, pair: FramesPair):
-        return pair.transform(self.__transform_image, self.__transform_lines)
+        return FramesPair(
+            images_pair=tuple(map(self.__transform_image, pair.images_pair)),
+            images_metadata_pair=pair.images_metadata_pair,
+            lines_pair=tuple(map(self.__transform_lines, pair.lines_pair)),
+        )
 
     def _build_model(self):
         return Matching(self.config).eval().to(self.device)
@@ -115,10 +119,20 @@ class Adapter(TorchAdapter):
         transformed_image = cv2.resize(
             image, (self.config["resize"]["width"], self.config["resize"]["height"])
         )
-        transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_RGB2GRAY)
+        transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_RGB2GRAY) / 255.0
         return torch.from_numpy(transformed_image).float()[None, None].to(self.device)
 
     def __transform_lines(self, lines: np.ndarray):
+        # mask for lines where x1 >= x2
+        x1_index = 0
+        x2_index = 2
+        mask = lines[:, x1_index] >= lines[:, x2_index]
+        # for masked lines: x1, y1, x2, y2 -> x2, y2, x1, y1
+        columns_order = [2, 3, 0, 1]
+        lines[mask] = lines[mask][:, columns_order]
+        # [x1, y1, x2, y2] -> [[x1, y1], [x2, y2]]
+        lines = lines.reshape((-1, 2, 2))
+
         return lines
 
     def __create_frame_data(self, lines, image, frame_number):

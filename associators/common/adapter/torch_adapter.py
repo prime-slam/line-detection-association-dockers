@@ -52,16 +52,15 @@ class TorchAdapter(AdapterBase, ABC):
                 device_name = "cuda"
             else:
                 print("No cuda device available! Fall back on cpu.")
-
         self.device = device_name
 
     def run(self) -> None:
-        image_loader = self._create_frame_pairs_loader()
+        frame_pairs_loader = self._create_frame_pairs_loader()
         model = self._build_model()
 
         with torch.no_grad():
-            for frame_pairs_batch, metadata_batch in tqdm(image_loader):
-                for frame_pairs, metadata in zip(frame_pairs_batch, metadata_batch):
-                    raw_predictions = self._predict(model, frame_pairs)
-                    prediction = self._postprocess_prediction(raw_predictions, metadata)
+            for frame_pairs_batch in tqdm(frame_pairs_loader):
+                for frame_pair in frame_pairs_batch:
+                    raw_predictions = self._predict(model, frame_pair)
+                    prediction = self._postprocess_prediction(raw_predictions, frame_pair.images_metadata_pair)
                     self._save_prediction(prediction)

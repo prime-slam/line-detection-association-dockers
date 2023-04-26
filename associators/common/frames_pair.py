@@ -17,13 +17,11 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Any, Callable
 
+from common.image_metadata import ImageMetadata
+
 
 @dataclass
 class FramesPair:
     images_pair: Tuple[Any, Any]
+    images_metadata_pair: Tuple[ImageMetadata, ImageMetadata]
     lines_pair: Tuple[np.ndarray, np.ndarray]
-
-    def transform(self, transform_image: Callable, transform_lines: Callable):
-        self.images_pair = tuple(map(transform_image, self.images_pair))
-        self.lines_pair = tuple(map(transform_lines, self.lines_pair))
-        return self

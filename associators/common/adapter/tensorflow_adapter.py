@@ -52,11 +52,11 @@ class TensorflowAdapter(AdapterBase, ABC):
         self.device = device_name
 
     def run(self) -> None:
-        image_loader = self._create_frame_pairs_loader()
+        frame_pairs_loader = self._create_frame_pairs_loader()
         model = self._build_model()
 
         with tf.device(self.device):
-            for frame_pairs, metadata in tqdm(image_loader):
-                raw_predictions = self._predict(model, frame_pairs)
-                prediction = self._postprocess_prediction(raw_predictions, metadata)
+            for frame_pair in tqdm(frame_pairs_loader):
+                raw_predictions = self._predict(model, frame_pair)
+                prediction = self._postprocess_prediction(raw_predictions, frame_pair.images_metadata_pair)
                 self._save_prediction(prediction)

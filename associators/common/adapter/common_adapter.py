@@ -34,14 +34,14 @@ class CommonAdapter(AdapterBase, ABC):
             lines_path,
             associations_dir,
             output_path,
-            association_scores_dir
+            association_scores_dir,
         )
 
     def run(self) -> None:
-        image_loader = self._create_frame_pairs_loader()
+        frame_pairs_loader = self._create_frame_pairs_loader()
         model = self._build_model()
 
-        for image, metadata in tqdm(image_loader):
-            raw_predictions = self._predict(model, image)
-            prediction = self._postprocess_prediction(raw_predictions, metadata)
+        for frame_pair in tqdm(frame_pairs_loader):
+            raw_predictions = self._predict(model, frame_pair)
+            prediction = self._postprocess_prediction(raw_predictions, frame_pair.images_metadata_pair)
             self._save_prediction(prediction)
