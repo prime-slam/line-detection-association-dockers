@@ -19,9 +19,11 @@ from common.frames_pair import FramesPair
 
 def collate_frames_pair(pair: FramesPair):
     return FramesPair(
-        lines_pair=pair.lines_pair, images_pair=default_collate(pair.images_pair)
+        lines_pair=pair.lines_pair,
+        images_metadata_pair=pair.images_metadata_pair,
+        images_pair=default_collate(pair.images_pair),
     )
 
 
 def collate(batch):
-    return [collate_frames_pair(elem[0]) for elem in batch], [elem[1] for elem in batch]
+    return [collate_frames_pair(elem) for elem in batch]

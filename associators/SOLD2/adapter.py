@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import cv2
+import itertools as it
 import kornia as K
 import kornia.feature as KF
 import numpy as np
@@ -68,7 +69,16 @@ class Adapter(TorchAdapter):
         )
 
     def _transform_frames_pair(self, pair: FramesPair):
-        return pair.transform(self.__transform_image, self.__transform_lines)
+        return FramesPair(
+            images_pair=tuple(map(self.__transform_image, pair.images_pair)),
+            images_metadata_pair=pair.images_metadata_pair,
+            lines_pair=tuple(
+                it.starmap(
+                    self.__transform_lines,
+                    zip(pair.lines_pair, pair.images_metadata_pair),
+                )
+            ),
+        )
 
     def _build_model(self):
         return KF.SOLD2().eval().to(self.device)
@@ -102,7 +112,14 @@ class Adapter(TorchAdapter):
         transformed = K.color.rgb_to_grayscale(transformed)
         return transformed.to(self.device)
 
-    def __transform_lines(self, lines: np.ndarray):
-        return torch.from_numpy(lines.reshape(-1, 2, 2).astype(np.float32)).to(
-            self.device
-        )
+    def __transform_lines(self, lines: np.ndarray, image_metadata: ImageMetadata):
+        model_height, model_width = self.model_resolution
+        x_scale = model_width / image_metadata.width
+        y_scale = model_height / image_metadata.height
+        x_index = [0, 2]
+        y_index = [1, 3]
+        lines[:, x_index] *= x_scale
+        lines[:, y_index] *= y_scale
+        return torch.from_numpy(
+            np.flip(lines.reshape((-1, 2, 2)), axis=-1).astype(np.float32)
+        ).to(self.device)

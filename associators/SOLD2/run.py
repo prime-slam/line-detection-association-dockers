@@ -15,6 +15,7 @@
 from pathlib import Path
 
 from adapter import Adapter
+from common.device import Device
 from common.parser import positive_int, create_dl_base_parser
 
 if __name__ == "__main__":
@@ -38,5 +39,5 @@ if __name__ == "__main__":
         output_path=Path(args.output),
         frames_step=args.step,
         pairs_file=args.pairs,
-        device=args.device,
+        device=Device[args.device],
     ).run()
